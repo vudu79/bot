@@ -13,8 +13,5 @@ async def start_handler(message : types.Message):
     await bot.send_message(message.from_user.id, 'Поиск gif картинок по заданному ключевому слову.' )
 
 
-
-
-
 def register_handlers_client(dp : Dispatcher):
     dp.register_message_handler(start_handler, commands=['start', 'help'])
