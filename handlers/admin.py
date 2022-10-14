@@ -1,72 +1,143 @@
+import json
+
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram import types, Dispatcher
 from create_bot import dp
+from client.http_client import *
 
-class FSMAdmin(StatesGroup):
-    photo = State()
-    name = State()
-    description = State()
-    price = State()
+class FSMSearch(StatesGroup):
+    subj = State()
+    limit = State()
 
+# Машина состояний для searchAPI________________________________________________________________________________________
 # Запускаем машину состояния FSMAdmin хэндлером
-@dp.message_handler(commands=['загрузить'], state=None)
-async def cm_start(message : types.Message):
-    await FSMAdmin.photo.set()
-    await message.reply("загрузите фото")
+@dp.message_handler(Text(equals="Найти по слову" , ignore_case=True), state=None)
+async def cm_start_search(message : types.Message):
+    await FSMSearch.subj.set()
+    await message.answer("Напишите ключевое слово для поиска")
 
-# Устанавливаем машину состояния в состояние приема фото и запрашиваем у пользователя файл
-@dp.message_handler(content_types=['photo'], state=FSMAdmin.photo)
-async def load_fhoto(message : types.Message, state : FSMContext):
-    async with state.proxy() as data:
-        data['photo'] = message.photo[0].file_id
-    await FSMAdmin.next()
-    await message.reply("Введи название")
-
-# Устанавливаем машину состояния в состояние приема названия и запрашиваем у пользователя текст
-@dp.message_handler(state=FSMAdmin.name)
-async def load_name(message : types.Message, state : FSMContext):
-    async with state.proxy() as data:
-        data['name'] = message.text
-    await FSMAdmin.next()
-    await message.reply("Введи описание")
-
-# Устанавливаем машину состояния в состояние приема описания и запрашиваем у пользователя текст
-@dp.message_handler(state=FSMAdmin.description)
-async def load_description(message : types.Message, state : FSMContext):
-    async with state.proxy() as data:
-        data['description'] = message.text
-    await FSMAdmin.next()
-    await message.reply("Теперь введи цену")
-
-# Устанавливаем машину состояния в состояние приема цены товара и запрашиваем у пользователя текст. В конце останавливаем машину состояния
-@dp.message_handler(state=FSMAdmin.price)
-async def load_price(message : types.Message, state : FSMContext):
-    async with state.proxy() as data:
-        data['price'] = float(message.text)
-
-    # ПОСЛЕ КОМАНДЫ finish() очишаются все данные в state storage!!!!
-    async with state.proxy() as data:
-        await message.reply(str(data))
-    await state.finish()
 
 # Выход из состояния
 @dp.message_handler(state="*", commands='отмена')
-@dp.message_handler(Text(equals='отмена', ignore_case=True), state="*")
-async def cansel_state(maseege : types.Message, state: FSMContext):
+@dp.message_handler(Text(equals=['отмена', 'Отменить поиск'], ignore_case=True), state="*")
+async def cansel_state_search(maseege : types.Message, state: FSMContext):
     current_state = await state.get_state()
     if current_state is None:
         return
     await state.finish()
-    await maseege.reply("Ok")
+    await maseege.reply("Ok, отменяем)")
+    await maseege.answer("Что будем искать?)")
+
+
+# Устанавливаем машину состояния в состояние приема фото и запрашиваем у пользователя файл
+@dp.message_handler(state=FSMSearch.subj)
+async def load_subj_sm_search(message : types.Message, state : FSMContext):
+    async with state.proxy() as data:
+        data['subj'] = message.text
+    await FSMSearch.next()
+    await message.answer("Сколько найти гифок? Максимальное количество - 1000 в сутки")
+
+# Устанавливаем машину состояния в состояние приема названия и запрашиваем у пользователя текст
+@dp.message_handler(state=FSMSearch.limit)
+async def load_limit_sm_search(message : types.Message, state : FSMContext):
+    async with state.proxy() as data:
+        data['limit'] = message.text
+    await FSMSearch.next()
+    await message.answer("Okey, я запомнил. Произвожу поиск ...")
+    async with state.proxy() as data:
+        list_gifs = search_req(data["subj"],data["limit"])
+        for gif in list_gifs:
+            await message.answer(gif)
+    await state.finish()
+
+# Машина состояний для randomAPI________________________________________________________________________________________
+
+
+class FSMRandom(StatesGroup):
+    subj = State()
+
+@dp.message_handler(Text(equals="Случайная по слову" , ignore_case=True), state=None)
+async def cm_start_random(message : types.Message):
+    await FSMRandom.subj.set()
+    await message.answer("Напишите ключевое слово для поиска")
+
+
+@dp.message_handler(state="*", commands='отмена')
+@dp.message_handler(Text(equals=['отмена', 'Отменить поиск'], ignore_case=True), state="*")
+async def cansel_state_random(maseege : types.Message, state: FSMContext):
+    current_state = await state.get_state()
+    if current_state is None:
+        return
+    await state.finish()
+    await maseege.answer("Ok, отменяем)")
+    await maseege.answer("Что будем искать?)")
+
+
+@dp.message_handler(state=FSMRandom.subj)
+async def load_subj_sm_random(message : types.Message, state : FSMContext):
+    async with state.proxy() as data:
+        data['subj'] = message.text
+    await FSMSearch.next()
+    await message.answer("Okey, я запомнил. Произвожу поиск ...")
+    async with state.proxy() as data:
+        await message.answer(random_req(data['subj']))
+    await state.finish()
+
+# Машина состояний для translateAPI________________________________________________
+
+class FSMTranslate(StatesGroup):
+    phrase = State()
+
+@dp.message_handler(Text(equals="Гифка под фразу" , ignore_case=True), state=None)
+async def cm_start_translate(message : types.Message):
+    await FSMTranslate.phrase.set()
+    await message.answer("Напишите любую фразу на английском языке")
+
+
+@dp.message_handler(state="*", commands='отмена')
+@dp.message_handler(Text(equals=['отмена', 'Отменить поиск'], ignore_case=True), state="*")
+async def cansel_state_translate(maseege : types.Message, state: FSMContext):
+    current_state = await state.get_state()
+    if current_state is None:
+        return
+    await state.finish()
+    await maseege.reply("Ok, отменяем)")
+    await maseege.answer("Что будем искать?)")
+
+@dp.message_handler(state=FSMTranslate.phrase)
+async def load_subj_sm_translate(message : types.Message, state : FSMContext):
+    async with state.proxy() as data:
+        data['phrase'] = message.text
+    await FSMTranslate.next()
+    await message.answer("Okey, я запомнил. Произвожу поиск ...")
+    async with state.proxy() as data:
+        await message.answer(translate_req(data['phrase']))
+    await state.finish()
+
+# trendAPI_________________________________________________________________
+
+@dp.message_handler(Text(equals="Гифки в тренде"))
+async def translate_api(message : types.Message):
+    await message.answer("Минутку, произвожу поиск...")
+    gifs = trend_req()
+    for gif in gifs:
+        await message.answer(gif)
 
 
 def register_handlers_admin(dp : Dispatcher):
-    dp.register_message_handler(cm_start, commands=['загрузить'], state=None)
-    dp.register_message_handler(load_fhoto, content_types=['photo'], state=FSMAdmin.photo)
-    dp.register_message_handler(load_name, state=FSMAdmin.name)
-    dp.register_message_handler(load_description, state=FSMAdmin.description)
-    dp.register_message_handler(load_price, state=FSMAdmin.price)
-    dp.register_message_handler(cansel_state, state="*", commands='отмена')
-    dp.register_message_handler(cansel_state, Text(equals='отмена', ignore_case=True), state="*")
+    dp.register_message_handler(cm_start_search, Text(equals="Найти по слову" , ignore_case=True), state=None)
+    dp.register_message_handler(cansel_state_search, state="*", commands='отмена')
+    dp.register_message_handler(load_subj_sm_search, state=FSMSearch.subj)
+    dp.register_message_handler(load_limit_sm_search, state=FSMSearch.limit)
+
+    dp.register_message_handler(cm_start_random, Text(equals="Случайная по слову" , ignore_case=True), state=None)
+    dp.register_message_handler(cansel_state_random, state="*", commands='отмена')
+    dp.register_message_handler(load_subj_sm_random, state=FSMRandom.subj)
+
+    dp.register_message_handler(cm_start_translate, Text(equals="Гифка под фразу", ignore_case=True), state=None)
+    dp.register_message_handler(cansel_state_translate, state="*", commands='отмена')
+    dp.register_message_handler(load_subj_sm_translate, state=FSMTranslate.phrase)
+
+    dp.register_message_handler(translate_api, Text(equals="Гифка под фразу"))
