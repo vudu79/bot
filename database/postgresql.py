@@ -1,6 +1,5 @@
-import psycopg2
+import psycopg2, os
 from contextlib import closing
-from psycopg2 import Error
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from config import *
 
@@ -12,8 +11,10 @@ class DBase:
         self.password = PASSWORD
         self.database = DBNAME
         try:
-            self.connect = psycopg2.connect(host=self.hostname, user=self.username, password=self.password,
-                                            dbname=self.database)
+            # self.connect = psycopg2.connect(host=self.hostname, user=self.username, password=self.password,
+            #                                 dbname=self.database)
+
+            self.connect = psycopg2.connect(os.getenv("DATABASE_URL"))
 
             self.cursor = self.connect.cursor()
             self.cursor.execute("SELECT version();")
@@ -23,7 +24,7 @@ class DBase:
 
             self.cursor.execute('CREATE TABLE IF NOT EXISTS all_gifs(id INTEGER PRIMARY KEY, tag TEXT, url TEXT)')
 
-        except (Exception, Error) as error:
+        except (Exception) as error:
             print("Ошибка при работе с PostgreSQL", error)
 
     def save_gif(self, url):
