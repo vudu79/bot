@@ -3,10 +3,8 @@ from aiogram import Bot
 from aiogram.dispatcher import Dispatcher
 from handlers import client, admin, other
 from aiogram.utils.executor import start_webhook
+from create_bot import TOKEN, bot, dp
 
-TOKEN = os.getenv('BOT_TOKEN')
-bot = Bot(token=TOKEN)
-dp = Dispatcher(bot)
 
 HEROKU_APP_NAME = os.getenv('HEROKU_APP_NAME')
 
