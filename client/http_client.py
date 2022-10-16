@@ -38,21 +38,3 @@ def trend_req():
         dic[str(key)] = g
     return dic
 
-# start_time = time.time()
-# print("------------------------------")
-# trend_req()
-# print("--- %s seconds ---" % (time.time() - start_time))
-# start_time = time.time()
-# print("------------------------------")
-# search_req("cat", 5)
-# print("--- %s seconds ---" % (time.time() - start_time))
-# start_time = time.time()
-# print("------------------------------")
-# translate_req("walking man")
-# print("--- %s seconds ---" % (time.time() - start_time))
-# start_time = time.time()
-# print("------------------------------")
-# trend_req()
-# print("--- %s seconds ---" % (time.time() - start_time))
-# start_time = time.time()
-# print("--- %s seconds ---" % (time.time() - start_time))
