@@ -1,5 +1,5 @@
 from aiogram import types, Dispatcher
-from create_bot import bot, dp
+from main import bot, dp
 from keyboards import reply_keyboard
 
 

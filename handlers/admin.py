@@ -4,12 +4,16 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram import types, Dispatcher
-from create_bot import dp
+from main import dp
 from client.http_client import *
 from database import DBase
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
+
+
 
 gifs = dict()
 dbase = DBase()
+storage = MemoryStorage()
 
 class FSMSearch(StatesGroup):
     subj = State()
