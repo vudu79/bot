@@ -4,7 +4,6 @@ from aiogram.dispatcher import Dispatcher
 from handlers import client, admin, other
 from aiogram.utils.executor import start_webhook
 
-
 TOKEN = os.getenv('BOT_TOKEN')
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
@@ -21,12 +20,6 @@ WEBAPP_HOST = '0.0.0.0'
 WEBAPP_PORT = os.getenv('PORT', default=8000)
 
 
-async def on_startup(_):
-    print("Бот вышел в онлайн")
-
-
-
-
 async def on_startup(dispatcher):
     await bot.set_webhook(WEBHOOK_URL, drop_pending_updates=True)
 
@@ -39,8 +32,6 @@ client.register_handlers_client(dp)
 admin.register_handlers_admin(dp)
 other.register_handlers_other(dp)
 
-
-
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     start_webhook(
@@ -52,5 +43,3 @@ if __name__ == '__main__':
         host=WEBAPP_HOST,
         port=WEBAPP_PORT,
     )
-
-
