@@ -146,8 +146,8 @@ async def trand_api(message: types.Message):
 @dp.callback_query_handler(Text(startswith="save_"))
 async def colaback_hendler(collback: types.CallbackQuery):
     res = collback.data.split("_")[1]
-    dbase.save_gif(gifs[res])
-    print(gifs[res])
+    # dbase.save_gif(gifs[res])
+    # print(gifs[res])
     await collback.answer("Изображение сохранено!")
 
 
