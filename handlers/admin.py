@@ -23,7 +23,7 @@ class FSMSearch(StatesGroup):
 @dp.message_handler(Text(equals="Найти по слову", ignore_case=True), state=None)
 async def cm_start_search(message: types.Message):
     await FSMSearch.subj.set()
-    await message.answer("Напишите ключевое слово для поиска")
+    await message.answer("Напишите ключевое слово для поиска на английском языке")
 
 
 # Выход из состояния
@@ -44,7 +44,7 @@ async def load_subj_sm_search(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['subj'] = message.text
     await FSMSearch.next()
-    await message.answer("Сколько найти гифок? Максимальное количество - 1000 в сутки")
+    await message.answer("Укажите, сколько необходимо найти гифок (число от 1 до 1000).")
 
 
 # Устанавливаем машину состояния в состояние приема названия и запрашиваем у пользователя текст
@@ -71,7 +71,7 @@ class FSMRandom(StatesGroup):
 @dp.message_handler(Text(equals="Случайная по слову", ignore_case=True), state=None)
 async def cm_start_random(message: types.Message):
     await FSMRandom.subj.set()
-    await message.answer("Напишите ключевое слово для поиска")
+    await message.answer("Напишите ключевое слово для поиска на английском языке")
 
 
 @dp.message_handler(state="*", commands='отмена')
@@ -165,4 +165,4 @@ def register_handlers_admin(dp: Dispatcher):
     dp.register_message_handler(cansel_state_translate, state="*", commands='отмена')
     dp.register_message_handler(load_subj_sm_translate, state=FSMTranslate.phrase)
 
-    dp.register_message_handler(trand_api, Text(equals="Гифка под фразу"))
+    dp.register_message_handler(trand_api, Text(equals="Популярные гифки"))
