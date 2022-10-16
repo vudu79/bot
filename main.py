@@ -3,8 +3,11 @@ from handlers import client, admin, other
 from create_bot import dp
 
 
+
+
 async def on_startup(_):
     print("Бот вышел в онлайн")
+
 
 client.register_handlers_client(dp)
 admin.register_handlers_admin(dp)

@@ -1,11 +1,15 @@
-import json
-
 from aiogram.dispatcher import FSMContext
+
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram import types, Dispatcher
 from create_bot import dp
 from client.http_client import *
+from database import DBase
+
+gifs = dict()
+dbase = DBase()
 
 class FSMSearch(StatesGroup):
     subj = State()
@@ -119,11 +123,22 @@ async def load_subj_sm_translate(message : types.Message, state : FSMContext):
 # trendAPI_________________________________________________________________
 
 @dp.message_handler(Text(equals="Гифки в тренде"))
-async def translate_api(message : types.Message):
+async def trand_api(message : types.Message):
     await message.answer("Минутку, произвожу поиск...")
+    global gifs
+    gifs.clear()
     gifs = trend_req()
-    for gif in gifs:
-        await message.answer(gif)
+    for item in gifs.items():
+        await message.answer(item[1], reply_markup=InlineKeyboardMarkup(row_width=2).add(InlineKeyboardButton(text='Сохранить', callback_data=f'save_{item[0]}')))
+
+
+@dp.callback_query_handler(Text(startswith="save_"))
+async def colaback_hendler(collback : types.CallbackQuery):
+
+    res = collback.data.split("_")[1]
+    dbase.save_gif(gifs[res])
+    print(gifs[res])
+    await collback.answer("Изображение сохранено!")
 
 
 def register_handlers_admin(dp : Dispatcher):
@@ -140,4 +155,4 @@ def register_handlers_admin(dp : Dispatcher):
     dp.register_message_handler(cansel_state_translate, state="*", commands='отмена')
     dp.register_message_handler(load_subj_sm_translate, state=FSMTranslate.phrase)
 
-    dp.register_message_handler(translate_api, Text(equals="Гифка под фразу"))
+    dp.register_message_handler(trand_api, Text(equals="Гифка под фразу"))

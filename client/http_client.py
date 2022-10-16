@@ -4,7 +4,7 @@ import requests
 
 def random_req(subj):
     sess = requests.Session()
-    url = f'http://localhost:8080/random/{subj}'
+    url = f'https://safe-island-73854.herokuapp.com/random/{subj}'
     resp = sess.get(url)
     res = resp.json()
 
@@ -12,7 +12,7 @@ def random_req(subj):
 
 def search_req(subj, num):
     sess = requests.Session()
-    url = f'http://localhost:8080/search/{subj}/{num}/en'
+    url = f'https://safe-island-73854.herokuapp.com/search/{subj}/{num}/en'
     resp = sess.get(url)
     res = resp.json()
     print(type(res))
@@ -20,7 +20,7 @@ def search_req(subj, num):
 
 def translate_req(subj):
     sess = requests.Session()
-    url = f'http://localhost:8080/translate/{subj}'
+    url = f'https://safe-island-73854.herokuapp.com/translate/{subj}'
     resp = sess.get(url)
     res = resp.json()
     print(res)
@@ -28,16 +28,20 @@ def translate_req(subj):
 
 def trend_req():
     sess = requests.Session()
-    url = f'http://localhost:8080/trend'
+    url = f'https://safe-island-73854.herokuapp.com/trend'
     resp = sess.get(url)
     res = resp.json()
-    print(res)
-    return res
+    dic = dict()
+    key = 0
+    for g in res:
+        key= key+1
+        dic[str(key)] = g
+    return dic
 
-start_time = time.time()
-print("------------------------------")
-search_req("cat", 5)
-print("--- %s seconds ---" % (time.time() - start_time))
+# start_time = time.time()
+# print("------------------------------")
+# trend_req()
+# print("--- %s seconds ---" % (time.time() - start_time))
 # start_time = time.time()
 # print("------------------------------")
 # search_req("cat", 5)
