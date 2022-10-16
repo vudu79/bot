@@ -132,7 +132,7 @@ async def load_subj_sm_translate(message: types.Message, state: FSMContext):
 
 # trendAPI_________________________________________________________________
 
-@dp.message_handler(Text(equals="Гифки в тренде"))
+@dp.message_handler(Text(equals="Популярные гифки"))
 async def trand_api(message: types.Message):
     await message.answer("Минутку, произвожу поиск...")
     global gifs

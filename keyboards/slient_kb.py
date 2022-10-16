@@ -1,7 +1,7 @@
 from aiogram.types import ReplyKeyboardMarkup, ReplyKeyboardRemove, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
 
 search_btn = KeyboardButton('Найти по слову')
-trend_btn = KeyboardButton('Гифки в тренде')
+trend_btn = KeyboardButton('Популярные гифки')
 random_btn = KeyboardButton('Случайная по слову')
 translate_btn = KeyboardButton('Гифка под фразу')
 cansel_btn = KeyboardButton('Отменить поиск')
