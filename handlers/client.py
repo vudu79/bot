@@ -1,6 +1,7 @@
 from aiogram import types, Dispatcher
-from main import bot, dp
 from keyboards import reply_keyboard
+from create_bot import dp, bot
+
 
 
 @dp.message_handler(commands=['start', 'help'])

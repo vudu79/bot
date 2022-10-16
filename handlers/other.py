@@ -1,6 +1,6 @@
 from aiogram import types, Dispatcher
 import json, string
-from main import dp
+from create_bot import dp
 
 
 @dp.message_handler()

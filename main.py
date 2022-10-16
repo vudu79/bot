@@ -1,6 +1,4 @@
 import logging, os
-from aiogram import Bot
-from aiogram.dispatcher import Dispatcher
 from handlers import client, admin, other
 from aiogram.utils.executor import start_webhook
 from create_bot import TOKEN, bot, dp
