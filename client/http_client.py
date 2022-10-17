@@ -13,10 +13,8 @@ def search_req(subj, num, lang):
 
     sess = requests.Session()
     url = f'https://aiogram-bot-golang-server.herokuapp.com/search/{subj}/{num}/{lang}'
-    print(url)
     resp = sess.get(url)
     res = resp.json()
-    print(type(res))
     return res
 
 def translate_req(subj):
