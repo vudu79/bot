@@ -10,10 +10,6 @@ async def start_handler(message : types.Message):
     await bot.send_message(message.from_user.id, 'Это бот для поиска гифок в интернете разными способами))', reply_markup=reply_keyboard)
     await bot.send_message(message.from_user.id, "Как будем искать? тыц 👇")
 
-@dp.message_handler(commands=['Выборка'])
-async def start_handler(message : types.Message):
-    await bot.send_message(message.from_user.id, 'Поиск gif картинок по заданному ключевому слову.' )
-
 
 def register_handlers_client(dp : Dispatcher):
     dp.register_message_handler(start_handler, commands=['start', 'help'])

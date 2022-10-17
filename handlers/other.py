@@ -12,13 +12,12 @@ from emoji import emojize
 async def mat_filter_handler(message : types.Message):
     if {i.lower().translate(str.maketrans('','',string.punctuation)) for i in message.text.split(' ')}\
             .intersection(set(json.load(open('json_mat.json')))) != set():
-
         await message.reply("Маты запрещены в чате")
         await message.delete()
 
 @dp.message_handler()
 async def echo_message(msg: types.Message):
-    await bot.send_message(msg.from_user.id, msg.text)
+    await msg.reply(msg.text)
 
 @dp.message_handler(content_types=ContentType.ANY)
 async def unknown_message(msg: types.Message):
