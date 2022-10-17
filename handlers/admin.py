@@ -37,12 +37,12 @@ async def colaback_hendler_lang_start_search(collback: types.CallbackQuery):
     global leng_type
     global leng_phrase
     if res == "rus_":
-        leng_type.join("ru")
-        leng_phrase.join("русском языке")
+        leng_type=leng_type + "ru"
+        leng_phrase= leng_phrase + "русском языке"
         print(leng_type)
     elif res == "engl_":
-        leng_type.join("en")
-        leng_phrase.join("английском языке")
+        leng_type=leng_type + "en"
+        leng_phrase= leng_phrase + "английском языке"
         print(leng_type)
     await FSMSearch.subj.set()
     await collback.answer()
