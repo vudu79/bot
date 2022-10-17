@@ -63,7 +63,7 @@ async def load_subj_sm_search(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['subj'] = message.text
     await FSMSearch.next()
-    await message.answer("Сколько найти? Максимальное количество - 1000 gifs")
+    await message.answer("Сколько найти? Максимальное количество - 1000 gifs. Можно больше но стоит жадничать))")
 
 # Устанавливаем машину состояния в состояние приема названия и запрашиваем у пользователя текст
 @dp.message_handler(state=FSMSearch.limit)
