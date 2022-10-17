@@ -16,7 +16,6 @@ async def mat_filter_handler(message : types.Message):
         await message.delete()
     await message.reply(message.text)
 
-
 @dp.message_handler(content_types=ContentType.ANY)
 async def unknown_message(msg: types.Message):
     message_text = text(emojize('Я не знаю, что с этим делать :astonished:'),
