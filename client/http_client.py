@@ -1,9 +1,12 @@
+import os
+
 import requests
 
+server_url = os.getenv("SERVER_URL")
 
 def random_req(subj):
     sess = requests.Session()
-    url = f'https://aiogram-bot-golang-server.herokuapp.com/random/{subj}'
+    url = f'{server_url}/random/{subj}'
     resp = sess.get(url)
     res = resp.json()
 
@@ -12,14 +15,14 @@ def random_req(subj):
 def search_req(subj, num, lang):
 
     sess = requests.Session()
-    url = f'https://aiogram-bot-golang-server.herokuapp.com/search/{subj}/{num}/{lang}'
+    url = f'{server_url}/search/{subj}/{num}/{lang}'
     resp = sess.get(url)
     res = resp.json()
     return res
 
 def translate_req(subj):
     sess = requests.Session()
-    url = f'https://aiogram-bot-golang-server.herokuapp.com/translate/{subj}'
+    url = f'{server_url}/translate/{subj}'
     resp = sess.get(url)
     res = resp.json()
     print(res)
@@ -27,7 +30,7 @@ def translate_req(subj):
 
 def trend_req():
     sess = requests.Session()
-    url = f'https://aiogram-bot-golang-server.herokuapp.com/trend'
+    url = f'{server_url}/trend'
     resp = sess.get(url)
     res = resp.json()
     dic = dict()
