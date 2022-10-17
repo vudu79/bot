@@ -14,6 +14,7 @@ storage = MemoryStorage()
 
 
 class FSMSearch(StatesGroup):
+    lang = State()
     subj = State()
     limit = State()
 

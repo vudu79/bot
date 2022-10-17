@@ -10,9 +10,9 @@ def random_req(subj):
 
     return res
 
-def search_req(subj, num):
+def search_req(subj, num, lang):
     sess = requests.Session()
-    url = f'https://safe-island-73854.herokuapp.com/search/{subj}/{num}/ru'
+    url = f'https://safe-island-73854.herokuapp.com/search/{subj}/{num}/{lang}'
     resp = sess.get(url)
     res = resp.json()
     print(type(res))
