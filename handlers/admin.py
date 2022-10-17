@@ -46,7 +46,7 @@ async def colaback_hendler_lang_start_search(collback: types.CallbackQuery):
         print(leng_type)
     await FSMSearch.subj.set()
     await collback.answer()
-    await bot.send_message(collback.from_user.id, f'Напишите ключевое слово для поиска на {leng_phrase}')
+    await bot.send_message(collback.from_user.id, f'Напишите ключевое слово поиска на {leng_phrase}')
 
 
 # Выход из состояния
