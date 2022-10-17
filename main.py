@@ -1,9 +1,9 @@
 import logging, os
 import multiprocessing
-
 from handlers import client, admin, other
 from aiogram.utils.executor import start_webhook
 from create_bot import TOKEN, bot, dp
+from echo_server import run, HttpGetHandler
 
 HEROKU_APP_NAME = os.getenv('HEROKU_APP_NAME')
 
@@ -43,7 +43,7 @@ if __name__ == '__main__':
     #     port=WEBAPP_PORT,
     # )
 
-    kwa = {
+    kwa1 = {
         "dispatcher": dp,
         "webhook_path": WEBHOOK_PATH,
         "skip_updates": True,
@@ -53,5 +53,11 @@ if __name__ == '__main__':
         "port": WEBAPP_PORT,
     }
 
-    p1 = multiprocessing.Process(target=start_webhook, kwargs=kwa)
+    kwa2 = {
+        "handler_class": HttpGetHandler,
+    }
+
+    p1 = multiprocessing.Process(target=start_webhook, kwargs=kwa1)
+    p2 = multiprocessing.Process(target=run, kwargs=kwa2)
     p1.start()
+    p2.start()
