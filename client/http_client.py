@@ -6,7 +6,7 @@ encode_subj = ""
 
 def random_req(subj):
     sess = requests.Session()
-    url = f'https://safe-island-73854.herokuapp.com/random/{subj}'
+    url = f'https://aiogram-bot-golang-server.herokuapp.com/random/{subj}'
     resp = sess.get(url)
     res = resp.json()
 
@@ -20,7 +20,7 @@ def search_req(subj, num, lang):
         encode_subj = subj
 
     sess = requests.Session()
-    url = f'https://safe-island-73854.herokuapp.com/search/{encode_subj}/{num}/{lang}'
+    url = f'https://aiogram-bot-golang-server.herokuapp.com/search/{encode_subj}/{num}/{lang}'
     print(url)
     print("ddddddddddddddddddddddddddddddddddddddddd")
     resp = sess.get(url)
@@ -30,7 +30,7 @@ def search_req(subj, num, lang):
 
 def translate_req(subj):
     sess = requests.Session()
-    url = f'https://safe-island-73854.herokuapp.com/translate/{subj}'
+    url = f'https://aiogram-bot-golang-server.herokuapp.com/translate/{subj}'
     resp = sess.get(url)
     res = resp.json()
     print(res)
@@ -38,7 +38,7 @@ def translate_req(subj):
 
 def trend_req():
     sess = requests.Session()
-    url = f'https://safe-island-73854.herokuapp.com/trend'
+    url = f'https://aiogram-bot-golang-server.herokuapp.com/trend'
     resp = sess.get(url)
     res = resp.json()
     dic = dict()
