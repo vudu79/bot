@@ -13,6 +13,7 @@ def random_req(subj):
 def search_req(subj, num, lang):
     sess = requests.Session()
     url = f'https://safe-island-73854.herokuapp.com/search/{subj}/{num}/{lang}'
+    print(url)
     resp = sess.get(url)
     res = resp.json()
     print(type(res))
