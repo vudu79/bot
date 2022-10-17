@@ -3,7 +3,7 @@ import multiprocessing
 from handlers import client, admin, other
 from aiogram.utils.executor import start_webhook
 from create_bot import TOKEN, bot, dp
-from echo_server import run, HttpGetHandler
+from echo_server import run, HttpGetHandler, HTTPServer
 
 HEROKU_APP_NAME = os.getenv('HEROKU_APP_NAME')
 
@@ -54,6 +54,7 @@ if __name__ == '__main__':
     }
 
     kwa2 = {
+        "server_class" : HTTPServer,
         "handler_class": HttpGetHandler,
     }
 
