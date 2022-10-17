@@ -28,7 +28,6 @@ async def echo_message(msg: types.Message):
     await msg.reply(msg.text)
 
 
-
 def register_handlers_other(dp : Dispatcher):
     dp.register_message_handler(mat_filter_handler)
     dp.register_message_handler(unknown_message, content_types=ContentType.ANY)
