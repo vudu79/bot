@@ -1,8 +1,5 @@
-import time
 import requests
-from urllib.parse import quote
 
-encode_subj = ""
 
 def random_req(subj):
     sess = requests.Session()
@@ -13,18 +10,10 @@ def random_req(subj):
     return res
 
 def search_req(subj, num, lang):
-    global encode_subj
-    if lang == "ru":
-        encode_subj = quote(subj)
-    elif lang == "en":
-        encode_subj = subj
-
-    print(encode_subj)
 
     sess = requests.Session()
-    url = f'https://aiogram-bot-golang-server.herokuapp.com/search/{encode_subj}/{num}/{lang}'
+    url = f'https://aiogram-bot-golang-server.herokuapp.com/search/{subj}/{num}/{lang}'
     print(url)
-    print("ddddddddddddddddddddddddddddddddddddddddd")
     resp = sess.get(url)
     res = resp.json()
     print(type(res))
