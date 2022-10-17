@@ -45,11 +45,6 @@ async def colaback_hendler_lang_start_search(collback: types.CallbackQuery):
     await collback.answer(f'Напишите ключевое слово для поиска на {leng_phrase}')
 
 
-# @dp.message_handler(Text(equals="Найти по слову", ignore_case=True), state=None)
-# async def cm_start_search(message: types.Message):
-#     await message.answer("Напишите ключевое слово для поиска")
-
-
 # Выход из состояния
 @dp.message_handler(state="*", commands='отмена')
 @dp.message_handler(Text(equals=['отмена', 'Отменить поиск'], ignore_case=True), state="*")
@@ -69,7 +64,6 @@ async def load_subj_sm_search(message: types.Message, state: FSMContext):
         data['subj'] = message.text
     await FSMSearch.next()
     await message.answer("Сколько найти? Максимальное количество - 1000 gifs")
-
 
 # Устанавливаем машину состояния в состояние приема названия и запрашиваем у пользователя текст
 @dp.message_handler(state=FSMSearch.limit)
@@ -96,7 +90,7 @@ class FSMRandom(StatesGroup):
 @dp.message_handler(Text(equals="Случайная по слову", ignore_case=True), state=None)
 async def cm_start_random(message: types.Message):
     await FSMRandom.subj.set()
-    await message.answer("Напишите ключевое слово для поиска")
+    await message.answer("Напишите ключевое слово для поиска на английском языке")
 
 
 @dp.message_handler(state="*", commands='отмена')
@@ -191,4 +185,4 @@ def register_handlers_admin(dp: Dispatcher):
     dp.register_message_handler(cansel_state_translate, state="*", commands='отмена')
     dp.register_message_handler(load_subj_sm_translate, state=FSMTranslate.phrase)
 
-    dp.register_message_handler(trand_api, Text(equals="Гифка под фразу"))
+    dp.register_message_handler(trand_api, Text(equals="Популярные гифки"))
