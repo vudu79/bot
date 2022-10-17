@@ -20,11 +20,13 @@ class HttpGetHandler(BaseHTTPRequestHandler):
 def run(server_class=HTTPServer, handler_class=BaseHTTPRequestHandler):
     host = '0.0.0.0'
     # port = os.getenv('PORT', default="8000")
-    server_address = (host, 50000)
+    server_address = ("https://aiogram-bot-gifs.herokuapp.com", 50000)
     httpd = server_class(server_address, handler_class)
+
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
         httpd.server_close()
+        print("Сервер не запустился!!!!!!!!!!!!!!!!!!")
 
 
