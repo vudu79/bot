@@ -19,6 +19,8 @@ def search_req(subj, num, lang):
     elif lang == "en":
         encode_subj = subj
 
+    print(encode_subj)
+
     sess = requests.Session()
     url = f'https://aiogram-bot-golang-server.herokuapp.com/search/{encode_subj}/{num}/{lang}'
     print(url)
