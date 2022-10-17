@@ -2,6 +2,7 @@ import time
 import requests
 from urllib.parse import quote
 
+encode_subj = ""
 
 def random_req(subj):
     sess = requests.Session()
@@ -12,6 +13,7 @@ def random_req(subj):
     return res
 
 def search_req(subj, num, lang):
+    global encode_subj
     if lang == "ru":
         encode_subj = quote(subj)
     elif lang == "en":

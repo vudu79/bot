@@ -37,12 +37,12 @@ async def colaback_hendler_lang_start_search(collback: types.CallbackQuery):
     global leng_type
     global leng_phrase
     if res == "rus_":
-        leng_type=leng_type + "ru"
-        leng_phrase= leng_phrase + "русском языке"
+        leng_type = "ru"
+        leng_phrase = "русском языке"
         print(leng_type)
     elif res == "engl_":
-        leng_type=leng_type + "en"
-        leng_phrase= leng_phrase + "английском языке"
+        leng_type = "en"
+        leng_phrase = "английском языке"
         print(leng_type)
     await FSMSearch.subj.set()
     await collback.answer()
@@ -68,6 +68,7 @@ async def load_subj_sm_search(message: types.Message, state: FSMContext):
         data['subj'] = message.text
     await FSMSearch.next()
     await message.answer("Сколько найти? Максимальное количество - 1000 gifs. Пишите число, это например 1, 23, 333)))")
+
 
 # Устанавливаем машину состояния в состояние приема названия и запрашиваем у пользователя текст
 @dp.message_handler(state=FSMSearch.limit)
