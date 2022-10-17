@@ -18,3 +18,13 @@ add_all = InlineKeyboardButton(text="Dislike", callback_data="like_-1")
 
 inline_keyboard.add(add_me, add_all)
 
+
+inline_keyboard_lang = InlineKeyboardMarkup(row_width=2)
+rus_button = InlineKeyboardButton(text="Русский", callback_data="leng__ru_")
+english_button = InlineKeyboardButton(text="English", callback_data="leng__engl_")
+
+inline_keyboard.row(rus_button, english_button)
+
+
+
+

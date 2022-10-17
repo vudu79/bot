@@ -7,24 +7,47 @@ from create_bot import dp
 from client.http_client import *
 from database import DBase
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from keyboards import inline_keyboard_lang
 
 gifs = dict()
 dbase = DBase()
 storage = MemoryStorage()
+leng_type = ""
+leng_phrase = ""
 
 
 class FSMSearch(StatesGroup):
-    lang = State()
     subj = State()
     limit = State()
 
 
 # Машина состояний для searchAPI________________________________________________________________________________________
 # Запускаем машину состояния FSMAdmin хэндлером
-@dp.message_handler(Text(equals="Найти по слову", ignore_case=True), state=None)
-async def cm_start_search(message: types.Message):
+
+
+@dp.message_handler(Text(equals="Найти по слову", ignore_case=True))
+async def choose_lang_handler(message: types.Message):
+    await message.answer("Выберите язык на котором будете писать запрос", reply_markup=inline_keyboard_lang)
+
+
+@dp.callback_query_handler(Text(startswith="leng__"), state=None)
+async def colaback_hendler_lang_start_search(collback: types.CallbackQuery):
+    res = collback.data.split("__")[1]
+    global leng_type
+    global leng_phrase
+    if res == "rus_":
+        leng_type.join("ru")
+        leng_phrase.join("русском языке")
+    elif res == "engl_":
+        leng_type.join("en")
+        leng_phrase.join("английском языке")
     await FSMSearch.subj.set()
-    await message.answer("Напишите ключевое слово для поиска")
+    await collback.answer(f'Напишите ключевое слово для поиска на {leng_phrase}')
+
+
+# @dp.message_handler(Text(equals="Найти по слову", ignore_case=True), state=None)
+# async def cm_start_search(message: types.Message):
+#     await message.answer("Напишите ключевое слово для поиска")
 
 
 # Выход из состояния
@@ -45,7 +68,7 @@ async def load_subj_sm_search(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['subj'] = message.text
     await FSMSearch.next()
-    await message.answer("Сколько найти гифок? Максимальное количество - 1000 в сутки")
+    await message.answer("Сколько найти? Максимальное количество - 1000 gifs")
 
 
 # Устанавливаем машину состояния в состояние приема названия и запрашиваем у пользователя текст
@@ -56,9 +79,10 @@ async def load_limit_sm_search(message: types.Message, state: FSMContext):
     await FSMSearch.next()
     await message.answer("Okey, я запомнил. Произвожу поиск ...")
     async with state.proxy() as data:
-        list_gifs = search_req(data["subj"], data["limit"])
+        list_gifs = search_req(data["subj"], data["limit"], leng_type)
         for gif in list_gifs:
             await message.answer(gif)
+            await message.answer("Ну вот, что просили то и получили)) если ничего не появилось - я не виноват!!!")
     await state.finish()
 
 
@@ -153,7 +177,8 @@ async def colaback_hendler(collback: types.CallbackQuery):
 
 
 def register_handlers_admin(dp: Dispatcher):
-    dp.register_message_handler(cm_start_search, Text(equals="Найти по слову", ignore_case=True), state=None)
+    dp.register_message_handler(choose_lang_handler, Text(equals="Найти по слову", ignore_case=True))
+    dp.register_callback_query_handler(colaback_hendler_lang_start_search, Text(startswith="leng__"), state=None)
     dp.register_message_handler(cansel_state_search, state="*", commands='отмена')
     dp.register_message_handler(load_subj_sm_search, state=FSMSearch.subj)
     dp.register_message_handler(load_limit_sm_search, state=FSMSearch.limit)
