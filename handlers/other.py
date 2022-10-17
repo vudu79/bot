@@ -15,9 +15,6 @@ async def mat_filter_handler(message : types.Message):
         await message.reply("Маты запрещены в чате")
         await message.delete()
 
-@dp.message_handler()
-async def echo_message(msg: types.Message):
-    await msg.reply(msg.text)
 
 @dp.message_handler(content_types=ContentType.ANY)
 async def unknown_message(msg: types.Message):
@@ -26,8 +23,13 @@ async def unknown_message(msg: types.Message):
                         code('команда'), '/help', 'и кнопки внизу))')
     await msg.reply(message_text, parse_mode=ParseMode.MARKDOWN)
 
+@dp.message_handler()
+async def echo_message(msg: types.Message):
+    await msg.reply(msg.text)
+
+
 
 def register_handlers_other(dp : Dispatcher):
     dp.register_message_handler(mat_filter_handler)
-    dp.register_message_handler(echo_message)
     dp.register_message_handler(unknown_message, content_types=ContentType.ANY)
+    dp.register_message_handler(echo_message)
