@@ -1,5 +1,6 @@
 import time
 import requests
+from urllib.parse import quote
 
 
 def random_req(subj):
@@ -11,8 +12,13 @@ def random_req(subj):
     return res
 
 def search_req(subj, num, lang):
+    if lang == "ru":
+        encode_subj = quote(subj)
+    elif lang == "en":
+        encode_subj = subj
+
     sess = requests.Session()
-    url = f'https://safe-island-73854.herokuapp.com/search/{subj}/{num}/{lang}'
+    url = f'https://safe-island-73854.herokuapp.com/search/{encode_subj}/{num}/{lang}'
     print(url)
     print("ddddddddddddddddddddddddddddddddddddddddd")
     resp = sess.get(url)
