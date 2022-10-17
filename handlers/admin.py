@@ -3,7 +3,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram import types, Dispatcher
-from create_bot import dp
+from create_bot import dp, bot
 from client.http_client import *
 from database import DBase
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -33,16 +33,20 @@ async def choose_lang_handler(message: types.Message):
 @dp.callback_query_handler(Text(startswith="leng__"), state=None)
 async def colaback_hendler_lang_start_search(collback: types.CallbackQuery):
     res = collback.data.split("__")[1]
+    print(f'Выбран язык - {res}')
     global leng_type
     global leng_phrase
     if res == "rus_":
         leng_type.join("ru")
         leng_phrase.join("русском языке")
+        print(leng_type)
     elif res == "engl_":
         leng_type.join("en")
         leng_phrase.join("английском языке")
+        print(leng_type)
     await FSMSearch.subj.set()
-    await collback.answer(f'Напишите ключевое слово для поиска на {leng_phrase}')
+    await collback.answer()
+    await bot.send_message(collback.from_user.id, f'Напишите ключевое слово для поиска на {leng_phrase}')
 
 
 # Выход из состояния
@@ -63,7 +67,7 @@ async def load_subj_sm_search(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['subj'] = message.text
     await FSMSearch.next()
-    await message.answer("Сколько найти? Максимальное количество - 1000 gifs. Можно больше но стоит жадничать)")
+    await message.answer("Сколько найти? Максимальное количество - 1000 gifs. Пишите число, это например 1, 23, 333)))")
 
 # Устанавливаем машину состояния в состояние приема названия и запрашиваем у пользователя текст
 @dp.message_handler(state=FSMSearch.limit)
