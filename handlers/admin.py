@@ -8,7 +8,7 @@ from client.http_client import *
 from database import DBase
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from keyboards import inline_keyboard_lang
-
+from aiogram.utils.markdown import text, italic, bold
 
 
 gifs = dict()
@@ -23,8 +23,18 @@ async def category_handler(message: types.Message):
     await message.answer("Часто ищут сейчас:")
     tegs = categories_tendor_req()
     for teg in tegs:
+        message_text = text(italic('Показать варианты на тему'), bold(f'{teg["searchterm"]}'))
         await bot.send_message(message.from_user.id, teg["image"], reply_markup=InlineKeyboardMarkup(row_width=1).add(
-            InlineKeyboardButton(text=f'Загрузить {teg["searchterm"]}', callback_data=f'ctegory_{teg["searchterm"]}')))
+            InlineKeyboardButton(text=message_text, callback_data=f'category__{teg["searchterm"]}')))
+
+@dp.callback_query_handler(Text(startswith="category__"), state=None)
+async def colaback_hendler_show_list_category(collback: types.CallbackQuery):
+    res = collback.data.split("__")[1]
+    await collback.answer(f'Выбрана категория {res}')
+    await bot.send_message(collback.from_user.id, f'Выбрана категория {res}')
+
+
+
 
 
 class FSMSearch(StatesGroup):
@@ -186,6 +196,7 @@ async def colaback_hendler(collback: types.CallbackQuery):
 
 def register_handlers_admin(dp: Dispatcher):
     dp.register_message_handler(category_handler, Text(equals="Популярные категории", ignore_case=True), state=None)
+    dp.register_callback_query_handler(colaback_hendler_show_list_category, Text(startswith="category__"), state=None)
     dp.register_message_handler(choose_lang_handler, Text(equals="Найти по слову", ignore_case=True))
     dp.register_callback_query_handler(colaback_hendler_lang_start_search, Text(startswith="leng__"), state=None)
     dp.register_message_handler(cansel_state_search, state="*", commands='отмена')
