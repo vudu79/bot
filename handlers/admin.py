@@ -67,7 +67,7 @@ async def load_subj_sm_search(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['subj'] = message.text
     await FSMSearch.next()
-    await message.answer("Сколько найти? Максимальное количество - 1000 gifs. Пишите число, это например 1, 23, 333)))")
+    await message.answer("Сколько найти? Максимальное количество - 1000 gifs. Пишите число, это например 1, 2, 22))")
 
 
 # Устанавливаем машину состояния в состояние приема названия и запрашиваем у пользователя текст
@@ -81,7 +81,7 @@ async def load_limit_sm_search(message: types.Message, state: FSMContext):
         list_gifs = search_req(data["subj"], data["limit"], leng_type)
         for gif in list_gifs:
             await message.answer(gif)
-            await message.answer("Ну вот, что просили то и получили)) если ничего не появилось - я не виноват!!!")
+            await message.answer("Сделано, жду команд!")
     await state.finish()
 
 
@@ -170,8 +170,7 @@ async def trand_api(message: types.Message):
 @dp.callback_query_handler(Text(startswith="save_"))
 async def colaback_hendler(collback: types.CallbackQuery):
     res = collback.data.split("_")[1]
-    # dbase.save_gif(gifs[res])
-    # print(gifs[res])
+
     await collback.answer("Изображение сохранено!")
 
 
