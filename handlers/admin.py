@@ -23,7 +23,7 @@ async def category_handler(message: types.Message):
     await message.answer("Часто ищут сейчас:")
     tegs = categories_tendor_req()
     for teg in tegs:
-        message_text = text(italic('Показать варианты на тему'), bold(f'{teg["searchterm"]}'))
+        message_text = text('Показать варианты из категории', bold(f'{teg["searchterm"]}'))
         await bot.send_message(message.from_user.id, teg["image"], reply_markup=InlineKeyboardMarkup(row_width=1).add(
             InlineKeyboardButton(text=message_text, callback_data=f'category__{teg["searchterm"]}')))
 
