@@ -16,6 +16,7 @@ leng_type = ""
 leng_phrase = ""
 
 
+
 @dp.message_handler(Text(equals="Популярные категории", ignore_case=True), state=None)
 async def category_handler(message: types.Message):
     await message.answer("Часто ищут сейчас:")
