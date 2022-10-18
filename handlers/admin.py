@@ -7,7 +7,7 @@ from create_bot import dp, bot
 from client.http_client import *
 from database import DBase
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from keyboards import inline_keyboard_lang
+
 
 gifs = dict()
 dbase = DBase()
