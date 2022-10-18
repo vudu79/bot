@@ -21,7 +21,7 @@ leng_phrase = ""
 @dp.message_handler(Text(equals="Популярные категории", ignore_case=True), state=None)
 async def category_handler(message: types.Message):
     await message.answer("Часто ищут сейчас:")
-    tegs = categories_tendor_req()
+    tegs = get_categories_tenor_req()
     for teg in tegs:
         message_text = text('Показать варианты из категории', bold(f'{teg["searchterm"]}'))
         await bot.send_message(message.from_user.id, teg["image"], reply_markup=InlineKeyboardMarkup(row_width=1).add(
@@ -31,10 +31,9 @@ async def category_handler(message: types.Message):
 async def colaback_hendler_show_list_category(collback: types.CallbackQuery):
     res = collback.data.split("__")[1]
     await collback.answer(f'Выбрана категория {res}')
-    await bot.send_message(collback.from_user.id, f'Выбрана категория {res}')
-
-
-
+    gifs_from_tenor_list = get_category_list_tenor_req(res)
+    for gif in gifs_from_tenor_list:
+        await bot.send_message(collback.from_user.id, gif)
 
 
 class FSMSearch(StatesGroup):

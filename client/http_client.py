@@ -40,11 +40,20 @@ def trend_req():
         dic[str(key)] = g
     return dic
 
-def categories_tendor_req():
+def get_categories_tenor_req():
     sess = requests.Session()
     url = f'{server_url}/categories'
     resp = sess.get(url)
     res = resp.json()
-
     return res
 
+def get_category_list_tenor_req(category):
+    sess = requests.Session()
+    url = f'{server_url}/category/{category}'
+    resp = sess.get(url)
+    res = resp.json()
+    return res
+
+# https://tenor.googleapis.com/v2/search?q=%D0%BF%D0%BB%D0%B5%D0%B2%D0%B0%D1%82%D1%8C&locale=ru&component=categories&contentfilter=high&key=AIzaSyCy4R_YbUoICqwCH7JGtJiGmOqPDcCO-Uw&client_key=my_test_app
+#
+# https://tenor.googleapis.com/v2/categories?key=AIzaSyCy4R_YbUoICqwCH7JGtJiGmOqPDcCO-Uw&client_key=my_test_app&locale=ru&type=featured
