@@ -40,3 +40,11 @@ def trend_req():
         dic[str(key)] = g
     return dic
 
+def categories_tendor_req():
+    sess = requests.Session()
+    url = f'{server_url}/categories'
+    resp = sess.get(url)
+    res = resp.json()
+
+    return res
+

@@ -16,6 +16,16 @@ leng_type = ""
 leng_phrase = ""
 
 
+
+@dp.message_handler(Text(equals="Популярные категории", ignore_case=True), state=None)
+async def category_handler(message: types.Message):
+    await message.answer("Часто ищут сейчас:")
+    tegs = categories_tendor_req()
+    for teg in tegs:
+        await bot.send_message(message.from_user.id, teg["image"], reply_markup=InlineKeyboardMarkup(row_width=1).add(
+            InlineKeyboardButton(text=f'Загрузить {teg["searchterm"]}', callback_data=f'ctegory_{teg["searchterm"]}')))
+
+
 class FSMSearch(StatesGroup):
     subj = State()
     limit = State()
@@ -23,7 +33,6 @@ class FSMSearch(StatesGroup):
 
 # Машина состояний для searchAPI________________________________________________________________________________________
 # Запускаем машину состояния FSMAdmin хэндлером
-
 
 @dp.message_handler(Text(equals="Найти по слову", ignore_case=True))
 async def choose_lang_handler(message: types.Message):
@@ -175,6 +184,7 @@ async def colaback_hendler(collback: types.CallbackQuery):
 
 
 def register_handlers_admin(dp: Dispatcher):
+    dp.register_message_handler(category_handler, Text(equals="Популярные категории", ignore_case=True), state=None)
     dp.register_message_handler(choose_lang_handler, Text(equals="Найти по слову", ignore_case=True))
     dp.register_callback_query_handler(colaback_hendler_lang_start_search, Text(startswith="leng__"), state=None)
     dp.register_message_handler(cansel_state_search, state="*", commands='отмена')
