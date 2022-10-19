@@ -31,23 +31,11 @@ async def category_handler(message: types.Message):
                                reply_markup=InlineKeyboardMarkup(row_width=1).add(
                                    InlineKeyboardButton(text=f'{teg["searchterm"]}',
                                                         callback_data=f'category__{teg["searchterm"]}')))
-
-
-@dp.callback_query_handler(Text(startswith="category__"), state=None)
-async def colaback_hendler_show_list_category(collback: types.CallbackQuery):
-    res = collback.data.split("__")[1]
-    await collback.answer(f'Выбрана категория {res}')
-    gifs_from_tenor_list = get_category_list_tenor_req(res)
-    for gif in gifs_from_tenor_list:
-        await bot.send_animation(collback.from_user.id, gif, reply_markup=InlineKeyboardMarkup(row_width=1).add(
-            InlineKeyboardButton(text="Сохранить в базу", callback_data="save__")))
-    await collback.answer()
-    await bot.send_message(collback.message.from_user.id,
+    await bot.send_message(message.from_user.id,
                            "Сделано! Могу собрать все популярные теги в кучу, чтобы не листать навех))",
                            reply_markup=InlineKeyboardMarkup(row_width=2).row(
                                InlineKeyboardButton(text="Собрать в кучу", callback_data="collect_cat__yes"),
                                InlineKeyboardButton(text="Буду листать", callback_data="collect_cat__no")))
-
 
 @dp.callback_query_handler(Text(startswith="collect_cat__"), state=None)
 async def colaback_hendler_collect_category(collback: types.CallbackQuery):
@@ -64,6 +52,18 @@ async def colaback_hendler_collect_category(collback: types.CallbackQuery):
         if res == "no":
             await bot.send_message(collback.from_user.id, bold('Ну... тогда листайте))'))
             await collback.answer()
+
+
+@dp.callback_query_handler(Text(startswith="category__"), state=None)
+async def colaback_hendler_show_list_category(collback: types.CallbackQuery):
+    res = collback.data.split("__")[1]
+    await collback.answer(f'Выбрана категория {res}')
+    gifs_from_tenor_list = get_category_list_tenor_req(res)
+    for gif in gifs_from_tenor_list:
+        await bot.send_animation(collback.from_user.id, gif, reply_markup=InlineKeyboardMarkup(row_width=1).add(
+            InlineKeyboardButton(text="Сохранить в базу", callback_data="save__")))
+    await collback.answer()
+
 
 
 dp.callback_query_handler(Text(startswith="category_after__"), state=None)
@@ -247,8 +247,9 @@ async def colaback_hendler(collback: types.CallbackQuery):
 
 def register_handlers_admin(dp: Dispatcher):
     dp.register_message_handler(category_handler, Text(equals="Популярные категории", ignore_case=True), state=None)
-    dp.register_callback_query_handler(colaback_hendler_show_list_category, Text(startswith="category__"), state=None)
     dp.register_callback_query_handler(colaback_hendler_collect_category, Text(startswith="collect_cat__"), state=None)
+    dp.register_callback_query_handler(colaback_hendler_show_list_category, Text(startswith="category__"), state=None)
+    dp.register_callback_query_handler(colaback_hendler_show_list_category_after_collect, Text(startswith="category_after__"), state=None)
 
     dp.register_message_handler(choose_lang_handler, Text(equals="Найти по слову", ignore_case=True))
     dp.register_callback_query_handler(colaback_hendler_lang_start_search, Text(startswith="leng__"), state=None)
