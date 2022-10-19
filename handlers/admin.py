@@ -147,8 +147,8 @@ async def colaback_hendler_show_list_category(collback: types.CallbackQuery):
     callback_user_id = collback.from_user.id
     res = collback.data.split("__")[1]
     await collback.answer(f'Выбрана категория {res}')
-    # gifs_from_tenor_list = get_category_list_tenor_req(res)
-    for gif in category_list:
+    gifs_from_tenor_list = get_category_list_tenor_req(res)
+    for gif in gifs_from_tenor_list:
         try:
             await bot.send_animation(callback_user_id, gif, reply_markup=InlineKeyboardMarkup(row_width=1).add(
                 InlineKeyboardButton(text="Сохранить в базу", callback_data="save__")))
