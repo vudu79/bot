@@ -25,11 +25,9 @@ category_list = []
 categories_callback = CallbackData("CategorY__", "page")
 
 
-def get_fruits_keyboard(page: int = 0) -> InlineKeyboardMarkup:
-    global category_list
-    category_list = get_categories_tenor_req()
+def get_fruits_keyboard(page: int = 0, size: int = 0) -> InlineKeyboardMarkup:
     keyboard = InlineKeyboardMarkup(row_width=1)
-    has_next_page = len(category_list) > page + 1
+    has_next_page = size > page + 1
 
     if page != 0:
         keyboard.add(
@@ -59,9 +57,12 @@ def get_fruits_keyboard(page: int = 0) -> InlineKeyboardMarkup:
 
 @dp.message_handler(Text(equals="Популярные категории", ignore_case=True))
 async def category_message_handler(message: types.Message):
+    global category_list
+    category_list = get_categories_tenor_req()
+    size_category_list = len(category_list)
     category_one = category_list[0]
     # caption = f"Вы выбрали <b>{fruit_data.get('display_name')}</b>"
-    keyboard = get_fruits_keyboard()  # Page: 0
+    keyboard = get_fruits_keyboard(size_category_list)  # Page: 0
 
     await bot.send_animation(
         chat_id=message.chat.id,
