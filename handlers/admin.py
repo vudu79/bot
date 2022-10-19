@@ -21,7 +21,7 @@ storage = MemoryStorage()
 leng_type = ""
 leng_phrase = ""
 
-categories_callback = CallbackData("CategorY__", "page")
+categories_callback = CallbackData("CategorY__", "page", "category_name")
 
 category_list = get_categories_tenor_req()
 
@@ -40,8 +40,8 @@ def get_fruits_keyboard(page: int = 0) -> InlineKeyboardMarkup:
 
     keyboard.add(
         InlineKeyboardButton(
-            text=f"• {page + 1}",
-            callback_data=categories_callback.new(page=page)
+            text=f'{category_list[page + 1]["searchterm"]}',
+            callback_data=categories_callback.new(category_name=f'{category_list[page + 1]["searchterm"]}')
         )
     )
 
