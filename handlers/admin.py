@@ -54,7 +54,7 @@ async def colaback_hendler_collect_category(collback: types.CallbackQuery):
     res = collback.data.split("__")[1]
     if res == "yes":
         for teg in teg_list:
-            inline_keyboard_category.add(InlineKeyboardButton(text=f'{teg["searchterm"]}', callback_data=f'category__{teg["searchterm"]}'))
+            inline_keyboard_category.add(InlineKeyboardButton(text=f'{teg["searchterm"]}', callback_data=f'category_after__{teg["searchterm"]}'))
 
         await bot.send_message(collback.from_user.id, bold('Вот что получилось. Выбирайте!'),
                                parse_mode=ParseMode.MARKDOWN,
@@ -65,6 +65,17 @@ async def colaback_hendler_collect_category(collback: types.CallbackQuery):
             await bot.send_message(collback.from_user.id, bold('Ну... тогда листайте))'))
             await collback.answer()
 
+
+dp.callback_query_handler(Text(startswith="category_after__"), state=None)
+async def colaback_hendler_show_list_category_after_collect(collback: types.CallbackQuery):
+    res = collback.data.split("__")[1]
+    await collback.answer(f'Выбрана категория {res}')
+    gifs_from_tenor_list = get_category_list_tenor_req(res)
+    for gif in gifs_from_tenor_list:
+        await bot.send_animation(collback.from_user.id, gif, reply_markup=InlineKeyboardMarkup(row_width=1).add(
+            InlineKeyboardButton(text="Сохранить в базу", callback_data="save__")))
+    await collback.answer()
+    await bot.send_message(collback.message.from_user.id, "Сделано! Что будем искать?")
 
 
 class FSMSearch(StatesGroup):
