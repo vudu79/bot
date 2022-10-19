@@ -49,6 +49,7 @@ def get_categories_tenor_req():
 
 def get_category_list_tenor_req(category):
     sess = requests.Session()
+    print(category)
     url = f'{server_url}/category/{category}'
     resp = sess.get(url)
     res = resp.json()
