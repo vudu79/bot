@@ -22,18 +22,12 @@ async def category_handler(message: types.Message):
     await message.answer("Часто ищут сейчас:")
     tegs = get_categories_tenor_req()
     for teg in tegs:
-        message_text = text(bold('Показать варианты из категории'))
-
         await bot.send_animation(message.from_user.id, teg["image"])
-        await bot.send_message(message.from_user.id, message_text, parse_mode=ParseMode.MARKDOWN,
+        await bot.send_message(message.from_user.id, bold('Показать варианты из категории'),
+                               parse_mode=ParseMode.MARKDOWN,
                                reply_markup=InlineKeyboardMarkup(row_width=1).add(
-                                   InlineKeyboardButton(text=message_text,
+                                   InlineKeyboardButton(text=f'{teg["searchterm"]}',
                                                         callback_data=f'category__{teg["searchterm"]}')))
-
-        # await bot.send_message(message.from_user.id, "--------------------------------------------")
-        #
-        # await bot.send_message(message.from_user.id, teg["image"], reply_markup=InlineKeyboardMarkup(row_width=1).add(
-        #     InlineKeyboardButton(text=message_text, callback_data=f'category__{teg["searchterm"]}')))
 
 
 @dp.callback_query_handler(Text(startswith="category__"), state=None)
