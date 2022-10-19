@@ -1,7 +1,7 @@
 import asyncio
 
 from aiogram.dispatcher import FSMContext
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, ParseMode, CallbackQuery
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
 from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram import types, Dispatcher
@@ -13,7 +13,7 @@ from client.http_client import *
 from database import DBase
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from keyboards import inline_keyboard_lang, inline_keyboard_category
-from aiogram.utils.markdown import text, italic, bold
+
 
 gifs = dict()
 dbase = DBase()
