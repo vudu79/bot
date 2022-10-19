@@ -34,7 +34,8 @@ def get_fruits_keyboard(page: int = 0) -> InlineKeyboardMarkup:
         keyboard.add(
             InlineKeyboardButton(
                 text="< Назад",
-                callback_data=categories_callback.new(page=page - 1)
+                callback_data=categories_callback.new(page=page - 1,
+                                                      category_name=f'{category_list[page - 1]["searchterm"]}')
             )
         )
 
@@ -49,7 +50,8 @@ def get_fruits_keyboard(page: int = 0) -> InlineKeyboardMarkup:
         keyboard.add(
             InlineKeyboardButton(
                 text="Вперёд >",
-                callback_data=categories_callback.new(page=page + 1)
+                callback_data=categories_callback.new(page=page + 1,
+                                                      category_name=f'{category_list[page + 1]["searchterm"]}')
             )
         )
 
