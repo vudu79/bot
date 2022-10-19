@@ -40,6 +40,9 @@ async def category_handler(message: types.Message):
 
         except RetryAfter as e:
             print("флудд исключение")
+            break
+
+            # bot.close()
             # await asyncio.sleep(e.timeout)
 
     await bot.send_message(user_id,
