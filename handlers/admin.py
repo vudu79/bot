@@ -120,23 +120,6 @@ async def show_list_category_colaback_hendler(collback: types.CallbackQuery):
     await collback.answer()
 
 
-#
-#
-# dp.callback_query_handler(Text(startswith="category_after__"), state=None)
-# async def colaback_hendler_show_list_category_after_collect(collback: types.CallbackQuery):
-#     callback_user_id = collback.from_user.id
-#     res = collback.data.split("__")[1]
-#     await collback.answer(f'Выбрана категория {res}')
-#     gifs_from_tenor_list = get_category_list_tenor_req(res)
-#     for gif in gifs_from_tenor_list:
-#         try:
-#             await bot.send_animation(callback_user_id, gif, reply_markup=InlineKeyboardMarkup(row_width=1).add(
-#                 InlineKeyboardButton(text="Сохранить в базу", callback_data="save__")))
-#         except RetryAfter as e:
-#             await asyncio.sleep(e.timeout)
-#     await collback.answer()
-#     await bot.send_message(callback_user_id, "Сделано! Что будем искать?")
-
 
 class FSMSearch(StatesGroup):
     subj = State()
@@ -301,8 +284,8 @@ async def trand_api(message: types.Message):
 async def colaback_hendler(collback: types.CallbackQuery):
     res = collback.data.split("_")[1]
     # dbase.save_gif(gifs[res])
-    print(gifs[res])
-    await collback.answer("Изображение сохранено!")
+    # print(gifs[res])
+    await collback.answer("В разработке...")
 
 
 def register_handlers_admin(dp: Dispatcher):
