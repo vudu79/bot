@@ -38,6 +38,7 @@ async def category_handler(message: types.Message):
                                        InlineKeyboardButton(text=f'{teg["searchterm"]}',
                                                             callback_data=f'category__{teg["searchterm"]}')))
         except RetryAfter as e:
+            print("флудд исключение")
             await asyncio.sleep(e.timeout)
 
     await bot.send_message(user_id,
