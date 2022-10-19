@@ -25,7 +25,7 @@ async def category_handler(message: types.Message):
     for teg in tegs:
         message_text = text('Показать варианты из категории', bold(f'{teg["searchterm"]}'))
         await bot.send_message(message.from_user.id, teg["image"], reply_markup=InlineKeyboardMarkup(row_width=1).add(
-            InlineKeyboardButton(text=message_text, callback_data=f'category__{teg["searchterm"]}')), parse_mode=ParseMode.HTML)
+            InlineKeyboardButton(text=message_text, parse_mode=ParseMode.HTML, callback_data=f'category__{teg["searchterm"]}')))
 
 @dp.callback_query_handler(Text(startswith="category__"), state=None)
 async def colaback_hendler_show_list_category(collback: types.CallbackQuery):
