@@ -1,10 +1,11 @@
 import asyncio
 
 from aiogram.dispatcher import FSMContext
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, ParseMode, CallbackQuery
 from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram import types, Dispatcher
+from aiogram.utils.callback_data import CallbackData
 from aiogram.utils.exceptions import RetryAfter
 
 from create_bot import dp, bot
@@ -19,89 +20,159 @@ dbase = DBase()
 storage = MemoryStorage()
 leng_type = ""
 leng_phrase = ""
-teg_list = []
+
+category_list = []
+categories_callback = CallbackData("CategorY__", "page")
 
 
-@dp.message_handler(Text(equals="Популярные категории", ignore_case=True), state=None)
-async def category_handler(message: types.Message):
-    user_id = message.from_user.id
-    await message.answer("Часто ищут сейчас:")
-    global teg_list
-    teg_list.clear()
-    teg_list = get_categories_tenor_req()
-    for teg in teg_list:
-        try:
-            await bot.send_animation(user_id, teg["image"])
-            await bot.send_message(user_id, bold('Показать варианты из категории'),
-                                   parse_mode=ParseMode.MARKDOWN,
-                                   reply_markup=InlineKeyboardMarkup(row_width=1).add(
-                                       InlineKeyboardButton(text=f'{teg["searchterm"]}',
-                                                            callback_data=f'category__{teg["searchterm"]}')))
+def get_fruits_keyboard(page: int = 0) -> InlineKeyboardMarkup:
+    global category_list
+    category_list = get_categories_tenor_req()
+    keyboard = InlineKeyboardMarkup(row_width=1)
+    has_next_page = len(category_list) > page + 1
 
-        except RetryAfter as e:
-            print("флудд исключение")
-            break
+    if page != 0:
+        keyboard.add(
+            InlineKeyboardButton(
+                text="< Назад",
+                callback_data=categories_callback.new(page=page - 1)
+            )
+        )
 
-            # bot.close()
-            # await asyncio.sleep(e.timeout)
+    keyboard.add(
+        InlineKeyboardButton(
+            text=f"• {page + 1}",
+            callback_data="dont_click_me"
+        )
+    )
 
-    await bot.send_message(user_id,
-                           "Сделано! Могу собрать все популярные теги в кучу, чтобы не листать навех))",
-                           reply_markup=InlineKeyboardMarkup(row_width=2).row(
-                               InlineKeyboardButton(text="Собрать в кучу", callback_data="collect_cat__yes"),
-                               InlineKeyboardButton(text="Буду листать", callback_data="collect_cat__no")))
+    if has_next_page:
+        keyboard.add(
+            InlineKeyboardButton(
+                text="Вперёд >",
+                callback_data=categories_callback.new(page=page + 1)
+            )
+        )
 
-
-@dp.callback_query_handler(Text(startswith="collect_cat__"), state=None)
-async def colaback_hendler_collect_category(collback: types.CallbackQuery):
-    callback_user_id = collback.from_user.id
-    res = collback.data.split("__")[1]
-    if res == "yes":
-        for teg in teg_list:
-            inline_keyboard_category.add(
-                InlineKeyboardButton(text=f'{teg["searchterm"]}', callback_data=f'category_after__{teg["searchterm"]}'))
-
-        await bot.send_message(callback_user_id, bold('Вот что получилось. Выбирайте!'),
-                               parse_mode=ParseMode.MARKDOWN,
-                               reply_markup=inline_keyboard_category)
-        await collback.answer()
-    else:
-        if res == "no":
-            await bot.send_message(callback_user_id, bold('Ну... тогда листайте))'))
-            await collback.answer()
+    return keyboard
 
 
-@dp.callback_query_handler(Text(startswith="category__"), state=None)
-async def colaback_hendler_show_list_category(collback: types.CallbackQuery):
-    callback_user_id = collback.from_user.id
-    res = collback.data.split("__")[1]
-    await collback.answer(f'Выбрана категория {res}')
-    gifs_from_tenor_list = get_category_list_tenor_req(res)
-    for gif in gifs_from_tenor_list:
-        try:
-            await bot.send_animation(callback_user_id, gif, reply_markup=InlineKeyboardMarkup(row_width=1).add(
-                InlineKeyboardButton(text="Сохранить в базу", callback_data="save__")))
-        except RetryAfter as e:
-            await asyncio.sleep(e.timeout)
-    await collback.answer()
+@dp.message_handler(Text(equals="Популярные категории", ignore_case=True))
+async def category_message_handler(message: types.Message):
+    category_one = category_list[0]
+    # caption = f"Вы выбрали <b>{fruit_data.get('display_name')}</b>"
+    keyboard = get_fruits_keyboard()  # Page: 0
+
+    await bot.send_animation(
+        chat_id=message.chat.id,
+        animation=category_one,
+        reply_markup=keyboard
+    )
+    # await bot.send_photo(
+    #     chat_id=message.chat.id,
+    #     photo=fruit_data.get("image_url"),
+    #     caption=caption,
+    #     parse_mode="HTML",
+    #     reply_markup=keyboard
+    # )
 
 
-dp.callback_query_handler(Text(startswith="category_after__"), state=None)
+@dp.callback_query_handler(categories_callback.filter())
+async def category_callback_handler(query: CallbackQuery, callback_data: dict):
+    page = int(callback_data.get("page"))
+
+    category_one = category_list[page]
+    # caption = f"Вы выбрали <b>{fruit_data.get('display_name')}</b>"
+    keyboard = get_fruits_keyboard(page)
+
+    await bot.send_animation(
+        chat_id=query.from_user.id,
+        animation=category_one,
+        reply_markup=keyboard
+    )
 
 
-async def colaback_hendler_show_list_category_after_collect(collback: types.CallbackQuery):
-    callback_user_id = collback.from_user.id
-    res = collback.data.split("__")[1]
-    await collback.answer(f'Выбрана категория {res}')
-    gifs_from_tenor_list = get_category_list_tenor_req(res)
-    for gif in gifs_from_tenor_list:
-        try:
-            await bot.send_animation(callback_user_id, gif, reply_markup=InlineKeyboardMarkup(row_width=1).add(
-                InlineKeyboardButton(text="Сохранить в базу", callback_data="save__")))
-        except RetryAfter as e:
-            await asyncio.sleep(e.timeout)
-    await collback.answer()
-    await bot.send_message(callback_user_id, "Сделано! Что будем искать?")
+#
+# @dp.message_handler(Text(equals="Популярные категории", ignore_case=True), state=None)
+# async def category_handler(message: types.Message):
+#     user_id = message.from_user.id
+#     await message.answer("Часто ищут сейчас:")
+#     global teg_list
+#     teg_list.clear()
+#     teg_list = get_categories_tenor_req()
+#     for teg in teg_list:
+#         try:
+#             await bot.send_animation(user_id, teg["image"])
+#             await bot.send_message(user_id, bold('Показать варианты из категории'),
+#                                    parse_mode=ParseMode.MARKDOWN,
+#                                    reply_markup=InlineKeyboardMarkup(row_width=1).add(
+#                                        InlineKeyboardButton(text=f'{teg["searchterm"]}',
+#                                                             callback_data=f'category__{teg["searchterm"]}')))
+#
+#         except RetryAfter as e:
+#             print("флудд исключение")
+#             break
+#
+#             # bot.close()
+#             # await asyncio.sleep(e.timeout)
+#
+#     await bot.send_message(user_id,
+#                            "Сделано! Могу собрать все популярные теги в кучу, чтобы не листать навех))",
+#                            reply_markup=InlineKeyboardMarkup(row_width=2).row(
+#                                InlineKeyboardButton(text="Собрать в кучу", callback_data="collect_cat__yes"),
+#                                InlineKeyboardButton(text="Буду листать", callback_data="collect_cat__no")))
+#
+#
+# @dp.callback_query_handler(Text(startswith="collect_cat__"), state=None)
+# async def colaback_hendler_collect_category(collback: types.CallbackQuery):
+#     callback_user_id = collback.from_user.id
+#     res = collback.data.split("__")[1]
+#     if res == "yes":
+#         for teg in teg_list:
+#             inline_keyboard_category.add(
+#                 InlineKeyboardButton(text=f'{teg["searchterm"]}', callback_data=f'category_after__{teg["searchterm"]}'))
+#
+#         await bot.send_message(callback_user_id, bold('Вот что получилось. Выбирайте!'),
+#                                parse_mode=ParseMode.MARKDOWN,
+#                                reply_markup=inline_keyboard_category)
+#         await collback.answer()
+#     else:
+#         if res == "no":
+#             await bot.send_message(callback_user_id, bold('Ну... тогда листайте))'))
+#             await collback.answer()
+#
+#
+# @dp.callback_query_handler(Text(startswith="category__"), state=None)
+# async def colaback_hendler_show_list_category(collback: types.CallbackQuery):
+#     callback_user_id = collback.from_user.id
+#     res = collback.data.split("__")[1]
+#     await collback.answer(f'Выбрана категория {res}')
+#     gifs_from_tenor_list = get_category_list_tenor_req(res)
+#     for gif in gifs_from_tenor_list:
+#         try:
+#             await bot.send_animation(callback_user_id, gif, reply_markup=InlineKeyboardMarkup(row_width=1).add(
+#                 InlineKeyboardButton(text="Сохранить в базу", callback_data="save__")))
+#         except RetryAfter as e:
+#             await asyncio.sleep(e.timeout)
+#     await collback.answer()
+#
+#
+# dp.callback_query_handler(Text(startswith="category_after__"), state=None)
+#
+#
+# async def colaback_hendler_show_list_category_after_collect(collback: types.CallbackQuery):
+#     callback_user_id = collback.from_user.id
+#     res = collback.data.split("__")[1]
+#     await collback.answer(f'Выбрана категория {res}')
+#     gifs_from_tenor_list = get_category_list_tenor_req(res)
+#     for gif in gifs_from_tenor_list:
+#         try:
+#             await bot.send_animation(callback_user_id, gif, reply_markup=InlineKeyboardMarkup(row_width=1).add(
+#                 InlineKeyboardButton(text="Сохранить в базу", callback_data="save__")))
+#         except RetryAfter as e:
+#             await asyncio.sleep(e.timeout)
+#     await collback.answer()
+#     await bot.send_message(callback_user_id, "Сделано! Что будем искать?")
 
 
 class FSMSearch(StatesGroup):
@@ -272,11 +343,13 @@ async def colaback_hendler(collback: types.CallbackQuery):
 
 
 def register_handlers_admin(dp: Dispatcher):
-    dp.register_message_handler(category_handler, Text(equals="Популярные категории", ignore_case=True), state=None)
-    dp.register_callback_query_handler(colaback_hendler_collect_category, Text(startswith="collect_cat__"), state=None)
-    dp.register_callback_query_handler(colaback_hendler_show_list_category, Text(startswith="category__"), state=None)
-    dp.register_callback_query_handler(colaback_hendler_show_list_category_after_collect,
-                                       Text(startswith="category_after__"), state=None)
+    # dp.register_message_handler(category_handler, Text(equals="Популярные категории", ignore_case=True), state=None)
+    # dp.register_callback_query_handler(colaback_hendler_collect_category, Text(startswith="collect_cat__"), state=None)
+    # dp.register_callback_query_handler(colaback_hendler_show_list_category, Text(startswith="category__"), state=None)
+    # dp.register_callback_query_handler(colaback_hendler_show_list_category_after_collect,Text(startswith="category_after__"), state=None)
+
+    dp.register_message_handler(category_message_handler, Text(equals="Популярные категории", ignore_case=True))
+    dp.register_callback_query_handler(category_callback_handler, categories_callback.filter())
 
     dp.register_message_handler(choose_lang_handler, Text(equals="Найти по слову", ignore_case=True))
     dp.register_callback_query_handler(colaback_hendler_lang_start_search, Text(startswith="leng__"), state=None)
