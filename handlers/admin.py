@@ -26,7 +26,7 @@ categories_callback = CallbackData("CategorY__", "page", "category_name")
 category_list = get_categories_tenor_req()
 
 
-def get_fruits_keyboard(page: int = 0) -> InlineKeyboardMarkup:
+def get_pagination_keyboard(page: int = 0) -> InlineKeyboardMarkup:
     keyboard = InlineKeyboardMarkup(row_width=1)
     has_next_page = len(category_list) > page + 1
 
@@ -58,32 +58,45 @@ def get_fruits_keyboard(page: int = 0) -> InlineKeyboardMarkup:
     return keyboard
 
 
-@dp.message_handler(Text(equals="Популярные категории", ignore_case=True))
-async def category_message_handler(message: types.Message):
-    category_one = category_list[0]
-    keyboard = get_fruits_keyboard()  # Page: 0
+@dp.message_handler(Text(equals="Популярные категории", ignore_case=True), state=None)
+async def category_handler(message: types.Message):
+    await bot.send_message(message.from_user.id,
+                           "Показать все категории или по одной, но с превью?",
+                           reply_markup=InlineKeyboardMarkup(row_width=2).row(
+                               InlineKeyboardButton(text="Все сразу", callback_data="collect_cat__yes"),
+                               InlineKeyboardButton(text="По одной", callback_data="collect_cat__no")))
 
-    await bot.send_animation(
-        chat_id=message.chat.id,
-        animation=category_one["image"],
-        reply_markup=keyboard
-    )
-    # await bot.send_photo(
-    #     chat_id=message.chat.id,
-    #     photo=fruit_data.get("image_url"),
-    #     caption=caption,
-    #     parse_mode="HTML",
-    #     reply_markup=keyboard
-    # )
+
+@dp.callback_query_handler(Text(startswith="collect_cat__"), state=None)
+async def colaback_hendler_collect_category(collback: types.CallbackQuery):
+    callback_user_id = collback.from_user.id
+    res = collback.data.split("__")[1]
+    if res == "yes":
+        for teg in category_list:
+            inline_keyboard_category.add(
+                InlineKeyboardButton(text=f'{teg["searchterm"]}', callback_data=f'category__{teg["searchterm"]}'))
+
+        await bot.send_message(callback_user_id, bold('Вот что получилось. Выбирайте!'),
+                               parse_mode=ParseMode.MARKDOWN,
+                               reply_markup=inline_keyboard_category)
+        await collback.answer()
+    else:
+        if res == "no":
+            category_one = category_list[0]
+            keyboard = get_pagination_keyboard()  # Page: 0
+
+            await bot.send_animation(
+                chat_id=callback_user_id,
+                animation=category_one["image"],
+                reply_markup=keyboard
+            )
 
 
 @dp.callback_query_handler(categories_callback.filter())
 async def category_callback_handler(query: CallbackQuery, callback_data: dict):
     page = int(callback_data.get("page"))
-
     category_one = category_list[page]
-    # caption = f"Вы выбрали <b>{fruit_data.get('display_name')}</b>"
-    keyboard = get_fruits_keyboard(page=page)
+    keyboard = get_pagination_keyboard(page=page)
 
     await bot.send_animation(
         chat_id=query.from_user.id,
@@ -92,56 +105,6 @@ async def category_callback_handler(query: CallbackQuery, callback_data: dict):
     )
 
 
-#
-# @dp.message_handler(Text(equals="Популярные категории", ignore_case=True), state=None)
-# async def category_handler(message: types.Message):
-#     user_id = message.from_user.id
-#     await message.answer("Часто ищут сейчас:")
-#     global teg_list
-#     teg_list.clear()
-#     teg_list = get_categories_tenor_req()
-#     for teg in teg_list:
-#         try:
-#             await bot.send_animation(user_id, teg["image"])
-#             await bot.send_message(user_id, bold('Показать варианты из категории'),
-#                                    parse_mode=ParseMode.MARKDOWN,
-#                                    reply_markup=InlineKeyboardMarkup(row_width=1).add(
-#                                        InlineKeyboardButton(text=f'{teg["searchterm"]}',
-#                                                             callback_data=f'category__{teg["searchterm"]}')))
-#
-#         except RetryAfter as e:
-#             print("флудд исключение")
-#             break
-#
-#             # bot.close()
-#             # await asyncio.sleep(e.timeout)
-#
-#     await bot.send_message(user_id,
-#                            "Сделано! Могу собрать все популярные теги в кучу, чтобы не листать навех))",
-#                            reply_markup=InlineKeyboardMarkup(row_width=2).row(
-#                                InlineKeyboardButton(text="Собрать в кучу", callback_data="collect_cat__yes"),
-#                                InlineKeyboardButton(text="Буду листать", callback_data="collect_cat__no")))
-#
-#
-# @dp.callback_query_handler(Text(startswith="collect_cat__"), state=None)
-# async def colaback_hendler_collect_category(collback: types.CallbackQuery):
-#     callback_user_id = collback.from_user.id
-#     res = collback.data.split("__")[1]
-#     if res == "yes":
-#         for teg in teg_list:
-#             inline_keyboard_category.add(
-#                 InlineKeyboardButton(text=f'{teg["searchterm"]}', callback_data=f'category_after__{teg["searchterm"]}'))
-#
-#         await bot.send_message(callback_user_id, bold('Вот что получилось. Выбирайте!'),
-#                                parse_mode=ParseMode.MARKDOWN,
-#                                reply_markup=inline_keyboard_category)
-#         await collback.answer()
-#     else:
-#         if res == "no":
-#             await bot.send_message(callback_user_id, bold('Ну... тогда листайте))'))
-#             await collback.answer()
-#
-#
 @dp.callback_query_handler(Text(startswith="category__"), state=None)
 async def colaback_hendler_show_list_category(collback: types.CallbackQuery):
     callback_user_id = collback.from_user.id
@@ -155,6 +118,8 @@ async def colaback_hendler_show_list_category(collback: types.CallbackQuery):
         except RetryAfter as e:
             await asyncio.sleep(e.timeout)
     await collback.answer()
+
+
 #
 #
 # dp.callback_query_handler(Text(startswith="category_after__"), state=None)
