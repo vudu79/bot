@@ -40,8 +40,8 @@ def get_fruits_keyboard(page: int = 0) -> InlineKeyboardMarkup:
 
     keyboard.add(
         InlineKeyboardButton(
-            text=f'{category_list[page + 1]["searchterm"]}',
-            callback_data=categories_callback.new(category_name=f'{category_list[page + 1]["searchterm"]}')
+            text=f'{category_list[page]["searchterm"]}',
+            callback_data=categories_callback.new(category_name=f'{category_list[page]["searchterm"]}')
         )
     )
 
