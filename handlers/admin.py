@@ -38,6 +38,7 @@ async def colaback_hendler_show_list_category(collback: types.CallbackQuery):
     for gif in gifs_from_tenor_list:
         await bot.send_animation(collback.from_user.id, gif, reply_markup=InlineKeyboardMarkup(row_width=1).add(
             InlineKeyboardButton(text="Сохранить в базу", callback_data="save__")))
+    await collback.answer()
     await bot.send_message(collback.from_user.id, "Сделано, жду команд!")
 
 
