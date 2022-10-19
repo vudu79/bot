@@ -17,6 +17,11 @@ leng_type = ""
 leng_phrase = ""
 teg_list = []
 
+@dp.errors_handler(exception=exceptions.RetryAfter)
+async def exception_handler(update: types.Update, exception: exceptions.RetryAfter):
+    await bot.send_message(update.message.from_user.id, "Не надо мне тут спамить!!!")
+    return True
+
 
 @dp.message_handler(Text(equals="Популярные категории", ignore_case=True), state=None)
 async def category_handler(message: types.Message):
@@ -246,6 +251,7 @@ async def colaback_hendler(collback: types.CallbackQuery):
 
 
 def register_handlers_admin(dp: Dispatcher):
+    dp.register_errors_handler(exception_handler, exception=exceptions.RetryAfter)
     dp.register_message_handler(category_handler, Text(equals="Популярные категории", ignore_case=True), state=None)
     dp.register_callback_query_handler(colaback_hendler_collect_category, Text(startswith="collect_cat__"), state=None)
     dp.register_callback_query_handler(colaback_hendler_show_list_category, Text(startswith="category__"), state=None)

@@ -25,13 +25,9 @@ async def unknown_message(msg: types.Message):
     await msg.reply(message_text, parse_mode=ParseMode.MARKDOWN)
 
 
-@dp.errors_handler(exception=exceptions.RetryAfter)
-async def exception_handler(update: types.Update, exception: exceptions.RetryAfter):
-    await bot.send_message(update.message.from_user.id, "Не надо мне тут спамить!!!")
-    return True
 
 
 def register_handlers_other(dp: Dispatcher):
     dp.register_message_handler(mat_filter_handler)
     dp.register_message_handler(unknown_message, content_types=ContentType.ANY)
-    dp.register_errors_handler(exception_handler, exception=exceptions.RetryAfter)
+
