@@ -1,8 +1,12 @@
+import asyncio
+
 from aiogram.dispatcher import FSMContext
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
 from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram import types, Dispatcher
+from aiogram.utils.exceptions import RetryAfter
+
 from create_bot import dp, bot
 from client.http_client import *
 from database import DBase
@@ -27,12 +31,16 @@ async def category_handler(message: types.Message):
     teg_list.clear()
     teg_list = get_categories_tenor_req()
     for teg in teg_list:
-        await bot.send_animation(message.from_user.id, teg["image"])
-        await bot.send_message(message.from_user.id, bold('Показать варианты из категории'),
+        try:
+            await bot.send_animation(message.from_user.id, teg["image"])
+            await bot.send_message(message.from_user.id, bold('Показать варианты из категории'),
                                parse_mode=ParseMode.MARKDOWN,
                                reply_markup=InlineKeyboardMarkup(row_width=1).add(
                                    InlineKeyboardButton(text=f'{teg["searchterm"]}',
                                                         callback_data=f'category__{teg["searchterm"]}')))
+        except RetryAfter as e:
+            await asyncio.sleep(e.timeout)
+
     await bot.send_message(message.from_user.id,
                            "Сделано! Могу собрать все популярные теги в кучу, чтобы не листать навех))",
                            reply_markup=InlineKeyboardMarkup(row_width=2).row(
