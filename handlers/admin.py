@@ -37,10 +37,10 @@ async def category_handler(message: types.Message):
                                    reply_markup=InlineKeyboardMarkup(row_width=1).add(
                                        InlineKeyboardButton(text=f'{teg["searchterm"]}',
                                                             callback_data=f'category__{teg["searchterm"]}')))
-            await asyncio.sleep(1)
+            await asyncio.sleep(0.2)
         except RetryAfter as e:
             print("флудд исключение")
-            await asyncio.sleep(e.timeout)
+            # await asyncio.sleep(e.timeout)
 
     await bot.send_message(user_id,
                            "Сделано! Могу собрать все популярные теги в кучу, чтобы не листать навех))",
