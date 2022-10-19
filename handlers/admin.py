@@ -26,14 +26,15 @@ teg_list = []
 
 @dp.message_handler(Text(equals="Популярные категории", ignore_case=True), state=None)
 async def category_handler(message: types.Message):
+    user_id = message.from_user.id
     await message.answer("Часто ищут сейчас:")
     global teg_list
     teg_list.clear()
     teg_list = get_categories_tenor_req()
     for teg in teg_list:
         try:
-            await bot.send_animation(message.from_user.id, teg["image"])
-            await bot.send_message(message.from_user.id, bold('Показать варианты из категории'),
+            await bot.send_animation(user_id, teg["image"])
+            await bot.send_message(user_id, bold('Показать варианты из категории'),
                                parse_mode=ParseMode.MARKDOWN,
                                reply_markup=InlineKeyboardMarkup(row_width=1).add(
                                    InlineKeyboardButton(text=f'{teg["searchterm"]}',
@@ -41,7 +42,7 @@ async def category_handler(message: types.Message):
         except RetryAfter as e:
             await asyncio.sleep(e.timeout)
 
-    await bot.send_message(message.from_user.id,
+    await bot.send_message(user_id,
                            "Сделано! Могу собрать все популярные теги в кучу, чтобы не листать навех))",
                            reply_markup=InlineKeyboardMarkup(row_width=2).row(
                                InlineKeyboardButton(text="Собрать в кучу", callback_data="collect_cat__yes"),
@@ -49,28 +50,30 @@ async def category_handler(message: types.Message):
 
 @dp.callback_query_handler(Text(startswith="collect_cat__"), state=None)
 async def colaback_hendler_collect_category(collback: types.CallbackQuery):
+    callback_user_id = collback.from_user.id
     res = collback.data.split("__")[1]
     if res == "yes":
         for teg in teg_list:
             inline_keyboard_category.add(InlineKeyboardButton(text=f'{teg["searchterm"]}', callback_data=f'category_after__{teg["searchterm"]}'))
 
-        await bot.send_message(collback.from_user.id, bold('Вот что получилось. Выбирайте!'),
+        await bot.send_message(callback_user_id, bold('Вот что получилось. Выбирайте!'),
                                parse_mode=ParseMode.MARKDOWN,
                                reply_markup=inline_keyboard_category)
         await collback.answer()
     else:
         if res == "no":
-            await bot.send_message(collback.from_user.id, bold('Ну... тогда листайте))'))
+            await bot.send_message(callback_user_id, bold('Ну... тогда листайте))'))
             await collback.answer()
 
 
 @dp.callback_query_handler(Text(startswith="category__"), state=None)
 async def colaback_hendler_show_list_category(collback: types.CallbackQuery):
+    callback_user_id = collback.from_user.id
     res = collback.data.split("__")[1]
     await collback.answer(f'Выбрана категория {res}')
     gifs_from_tenor_list = get_category_list_tenor_req(res)
     for gif in gifs_from_tenor_list:
-        await bot.send_animation(collback.from_user.id, gif, reply_markup=InlineKeyboardMarkup(row_width=1).add(
+        await bot.send_animation(callback_user_id, gif, reply_markup=InlineKeyboardMarkup(row_width=1).add(
             InlineKeyboardButton(text="Сохранить в базу", callback_data="save__")))
     await collback.answer()
 
@@ -78,14 +81,15 @@ async def colaback_hendler_show_list_category(collback: types.CallbackQuery):
 
 dp.callback_query_handler(Text(startswith="category_after__"), state=None)
 async def colaback_hendler_show_list_category_after_collect(collback: types.CallbackQuery):
+    callback_user_id = collback.from_user.id
     res = collback.data.split("__")[1]
     await collback.answer(f'Выбрана категория {res}')
     gifs_from_tenor_list = get_category_list_tenor_req(res)
     for gif in gifs_from_tenor_list:
-        await bot.send_animation(collback.from_user.id, gif, reply_markup=InlineKeyboardMarkup(row_width=1).add(
+        await bot.send_animation(callback_user_id, gif, reply_markup=InlineKeyboardMarkup(row_width=1).add(
             InlineKeyboardButton(text="Сохранить в базу", callback_data="save__")))
     await collback.answer()
-    await bot.send_message(collback.message.from_user.id, "Сделано! Что будем искать?")
+    await bot.send_message(callback_user_id, "Сделано! Что будем искать?")
 
 
 class FSMSearch(StatesGroup):
