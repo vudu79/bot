@@ -41,7 +41,7 @@ def get_fruits_keyboard(page: int = 0) -> InlineKeyboardMarkup:
     keyboard.add(
         InlineKeyboardButton(
             text=f"• {page + 1}",
-            callback_data="dont_click_me"
+            callback_data=categories_callback.new(page=page)
         )
     )
 
