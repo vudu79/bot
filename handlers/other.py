@@ -1,7 +1,6 @@
 from aiogram import types, Dispatcher
 import json, string
 from aiogram.types import ContentType, ParseMode
-from aiogram.utils import exceptions
 from aiogram.utils.emoji import emojize
 from aiogram.utils.markdown import text, italic, code
 from create_bot import dp, bot

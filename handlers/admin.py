@@ -9,6 +9,10 @@ from database import DBase
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from keyboards import inline_keyboard_lang, inline_keyboard_category
 from aiogram.utils.markdown import text, italic, bold
+from aiogram.utils import exceptions
+
+
+
 
 gifs = dict()
 dbase = DBase()
