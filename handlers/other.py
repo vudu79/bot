@@ -27,7 +27,7 @@ async def unknown_message(msg: types.Message):
 
 @dp.errors_handler(exception=exceptions.RetryAfter)
 async def exception_handler(update: types.Update, exception: exceptions.RetryAfter):
-    bot.send_message(update.message.from_user.id, "Не надо мне тут спамить!!!")
+    await bot.send_message(update.message.from_user.id, "Не надо мне тут спамить!!!")
     return True
 
 
