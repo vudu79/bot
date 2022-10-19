@@ -37,6 +37,7 @@ async def category_handler(message: types.Message):
                                    reply_markup=InlineKeyboardMarkup(row_width=1).add(
                                        InlineKeyboardButton(text=f'{teg["searchterm"]}',
                                                             callback_data=f'category__{teg["searchterm"]}')))
+            await asyncio.sleep(1)
         except RetryAfter as e:
             print("флудд исключение")
             await asyncio.sleep(e.timeout)
