@@ -9,7 +9,7 @@ from database import DBase
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from keyboards import inline_keyboard_lang, inline_keyboard_category
 from aiogram.utils.markdown import text, italic, bold
-from aiogram.utils import exceptions
+
 
 
 
@@ -21,10 +21,6 @@ leng_type = ""
 leng_phrase = ""
 teg_list = []
 
-@dp.errors_handler(exception=exceptions.RetryAfter)
-async def exception_handler(update: types.Update, exception: exceptions.RetryAfter):
-    await bot.send_message(update.message.from_user.id, "Не надо мне тут спамить!!!")
-    return True
 
 
 @dp.message_handler(Text(equals="Популярные категории", ignore_case=True), state=None)
