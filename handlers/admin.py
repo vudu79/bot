@@ -33,7 +33,7 @@ def get_pagination_keyboard(page: int = 0) -> InlineKeyboardMarkup:
     if page != 0:
         keyboard.add(
             InlineKeyboardButton(
-                text="< Назад",
+                text="👈",
                 callback_data=categories_callback.new(page=page - 1,
                                                       category_name=f'{category_list[page - 1]["searchterm"]}')
             )
@@ -49,7 +49,7 @@ def get_pagination_keyboard(page: int = 0) -> InlineKeyboardMarkup:
     if has_next_page:
         keyboard.add(
             InlineKeyboardButton(
-                text="Вперёд >",
+                text="👉",
                 callback_data=categories_callback.new(page=page + 1,
                                                       category_name=f'{category_list[page + 1]["searchterm"]}')
             )
