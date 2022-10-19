@@ -41,8 +41,8 @@ def get_fruits_keyboard(page: int = 0) -> InlineKeyboardMarkup:
 
     keyboard.add(
         InlineKeyboardButton(
-            text=f'{category_list[page]["searchterm"]}',
-            callback_data=f'Показать все из "{str.capitalize(category_list[page]["searchterm"])}"'
+            text=f'Показать все из "{str.capitalize(category_list[page]["searchterm"])}"',
+            callback_data=f'category__{category_list[page]["searchterm"]}"'
         )
     )
 
@@ -142,24 +142,22 @@ async def category_callback_handler(query: CallbackQuery, callback_data: dict):
 #             await collback.answer()
 #
 #
-# @dp.callback_query_handler(Text(startswith="category__"), state=None)
-# async def colaback_hendler_show_list_category(collback: types.CallbackQuery):
-#     callback_user_id = collback.from_user.id
-#     res = collback.data.split("__")[1]
-#     await collback.answer(f'Выбрана категория {res}')
-#     gifs_from_tenor_list = get_category_list_tenor_req(res)
-#     for gif in gifs_from_tenor_list:
-#         try:
-#             await bot.send_animation(callback_user_id, gif, reply_markup=InlineKeyboardMarkup(row_width=1).add(
-#                 InlineKeyboardButton(text="Сохранить в базу", callback_data="save__")))
-#         except RetryAfter as e:
-#             await asyncio.sleep(e.timeout)
-#     await collback.answer()
+@dp.callback_query_handler(Text(startswith="category__"), state=None)
+async def colaback_hendler_show_list_category(collback: types.CallbackQuery):
+    callback_user_id = collback.from_user.id
+    res = collback.data.split("__")[1]
+    await collback.answer(f'Выбрана категория {res}')
+    # gifs_from_tenor_list = get_category_list_tenor_req(res)
+    for gif in category_list:
+        try:
+            await bot.send_animation(callback_user_id, gif, reply_markup=InlineKeyboardMarkup(row_width=1).add(
+                InlineKeyboardButton(text="Сохранить в базу", callback_data="save__")))
+        except RetryAfter as e:
+            await asyncio.sleep(e.timeout)
+    await collback.answer()
 #
 #
 # dp.callback_query_handler(Text(startswith="category_after__"), state=None)
-#
-#
 # async def colaback_hendler_show_list_category_after_collect(collback: types.CallbackQuery):
 #     callback_user_id = collback.from_user.id
 #     res = collback.data.split("__")[1]
@@ -350,6 +348,7 @@ def register_handlers_admin(dp: Dispatcher):
 
     dp.register_message_handler(category_message_handler, Text(equals="Популярные категории", ignore_case=True))
     dp.register_callback_query_handler(category_callback_handler, categories_callback.filter())
+    dp.register_callback_query_handler(colaback_hendler_show_list_category, Text(startswith="category__"), state=None)
 
     dp.register_message_handler(choose_lang_handler, Text(equals="Найти по слову", ignore_case=True))
     dp.register_callback_query_handler(colaback_hendler_lang_start_search, Text(startswith="leng__"), state=None)
