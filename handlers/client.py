@@ -21,3 +21,4 @@ async def start_handler(message : types.Message):
 
 def register_handlers_client(dp : Dispatcher):
     dp.register_message_handler(start_handler, commands=['start', 'help'])
+    dp.register_errors_handler(exception_handler, exception=exceptions.RetryAfter)
