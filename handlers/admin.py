@@ -7,7 +7,7 @@ from create_bot import dp, bot
 from client.http_client import *
 from database import DBase
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from keyboards import inline_keyboard_lang
+from keyboards import inline_keyboard_lang, inline_keyboard_category
 from aiogram.utils.markdown import text, italic, bold
 
 gifs = dict()
@@ -15,13 +15,16 @@ dbase = DBase()
 storage = MemoryStorage()
 leng_type = ""
 leng_phrase = ""
+teg_list = []
 
 
 @dp.message_handler(Text(equals="Популярные категории", ignore_case=True), state=None)
 async def category_handler(message: types.Message):
     await message.answer("Часто ищут сейчас:")
-    tegs = get_categories_tenor_req()
-    for teg in tegs:
+    global teg_list
+    teg_list.clear()
+    teg_list = get_categories_tenor_req()
+    for teg in teg_list:
         await bot.send_animation(message.from_user.id, teg["image"])
         await bot.send_message(message.from_user.id, bold('Показать варианты из категории'),
                                parse_mode=ParseMode.MARKDOWN,
@@ -39,7 +42,29 @@ async def colaback_hendler_show_list_category(collback: types.CallbackQuery):
         await bot.send_animation(collback.from_user.id, gif, reply_markup=InlineKeyboardMarkup(row_width=1).add(
             InlineKeyboardButton(text="Сохранить в базу", callback_data="save__")))
     await collback.answer()
-    await bot.send_message(collback.from_user.id, "Сделано, жду команд!")
+    await bot.send_message(collback.message.from_user.id,
+                           "Сделано! Могу собрать все популярные теги в кучу, чтобы не листать навех))",
+                           reply_markup=InlineKeyboardMarkup(row_width=2).row(
+                               InlineKeyboardButton(text="Собрать в кучу", callback_data="collect_cat__yes"),
+                               InlineKeyboardButton(text="Буду листать", callback_data="collect_cat__no")))
+
+
+@dp.callback_query_handler(Text(startswith="collect_cat__"), state=None)
+async def colaback_hendler_collect_category(collback: types.CallbackQuery):
+    res = collback.data.split("__")[1]
+    if res == "yes":
+        for teg in teg_list:
+            inline_keyboard_category.add(InlineKeyboardButton(text=f'{teg["searchterm"]}', callback_data=f'category__{teg["searchterm"]}'))
+
+        await bot.send_message(collback.from_user.id, bold('Вот что получилось. Выбирайте!'),
+                               parse_mode=ParseMode.MARKDOWN,
+                               reply_markup=inline_keyboard_category)
+        await collback.answer()
+    else:
+        if res == "no":
+            await bot.send_message(collback.from_user.id, bold('Ну... тогда листайте))'))
+            await collback.answer()
+
 
 
 class FSMSearch(StatesGroup):
@@ -142,8 +167,9 @@ async def load_subj_sm_random(message: types.Message, state: FSMContext):
     await FSMSearch.next()
     await message.answer("Okey, я запомнил. Произвожу поиск ...")
     async with state.proxy() as data:
-        await bot.send_animation(message.from_user.id, random_req(data['subj']), reply_markup=InlineKeyboardMarkup(row_width=1).add(
-            InlineKeyboardButton(text="Сохранить в базу", callback_data="save__")))
+        await bot.send_animation(message.from_user.id, random_req(data['subj']),
+                                 reply_markup=InlineKeyboardMarkup(row_width=1).add(
+                                     InlineKeyboardButton(text="Сохранить в базу", callback_data="save__")))
     await state.finish()
     await message.answer("Сделано, жду команд!")
 
@@ -211,6 +237,8 @@ async def colaback_hendler(collback: types.CallbackQuery):
 def register_handlers_admin(dp: Dispatcher):
     dp.register_message_handler(category_handler, Text(equals="Популярные категории", ignore_case=True), state=None)
     dp.register_callback_query_handler(colaback_hendler_show_list_category, Text(startswith="category__"), state=None)
+    dp.register_callback_query_handler(colaback_hendler_collect_category, Text(startswith="collect_cat__"), state=None)
+
     dp.register_message_handler(choose_lang_handler, Text(equals="Найти по слову", ignore_case=True))
     dp.register_callback_query_handler(colaback_hendler_lang_start_search, Text(startswith="leng__"), state=None)
     dp.register_message_handler(cansel_state_search, state="*", commands='отмена')
