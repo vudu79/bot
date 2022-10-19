@@ -62,11 +62,11 @@ async def category_message_handler(message: types.Message):
     size_category_list = len(category_list)
     category_one = category_list[0]
     # caption = f"Вы выбрали <b>{fruit_data.get('display_name')}</b>"
-    keyboard = get_fruits_keyboard(size_category_list)  # Page: 0
+    keyboard = get_fruits_keyboard(size=size_category_list)  # Page: 0
 
     await bot.send_animation(
         chat_id=message.chat.id,
-        animation=category_one,
+        animation=category_one["image"],
         reply_markup=keyboard
     )
     # await bot.send_photo(
@@ -84,11 +84,11 @@ async def category_callback_handler(query: CallbackQuery, callback_data: dict):
 
     category_one = category_list[page]
     # caption = f"Вы выбрали <b>{fruit_data.get('display_name')}</b>"
-    keyboard = get_fruits_keyboard(page)
+    keyboard = get_fruits_keyboard(page=page)
 
     await bot.send_animation(
         chat_id=query.from_user.id,
-        animation=category_one,
+        animation=category_one["image"],
         reply_markup=keyboard
     )
 
