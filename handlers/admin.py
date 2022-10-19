@@ -38,6 +38,7 @@ async def colaback_hendler_show_list_category(collback: types.CallbackQuery):
     for gif in gifs_from_tenor_list:
         await bot.send_animation(collback.from_user.id, gif, reply_markup=InlineKeyboardMarkup(row_width=1).add(
             InlineKeyboardButton(text="Сохранить в базу", callback_data="save__")))
+    await bot.send_message(collback.from_user.id, "Сделано, жду команд!")
 
 
 class FSMSearch(StatesGroup):
@@ -103,8 +104,9 @@ async def load_limit_sm_search(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         list_gifs = search_req(data["subj"], data["limit"], leng_type)
         for gif in list_gifs:
-            await message.answer(gif)
-            await message.answer("Сделано, жду команд!")
+            await bot.send_animation(message.from_user.id, gif, reply_markup=InlineKeyboardMarkup(row_width=1).add(
+                InlineKeyboardButton(text="Сохранить в базу", callback_data="save__")))
+        await message.answer("Сделано, жду команд!")
     await state.finish()
 
 
@@ -139,8 +141,10 @@ async def load_subj_sm_random(message: types.Message, state: FSMContext):
     await FSMSearch.next()
     await message.answer("Okey, я запомнил. Произвожу поиск ...")
     async with state.proxy() as data:
-        await message.answer(random_req(data['subj']))
+        await bot.send_animation(message.from_user.id, random_req(data['subj']), reply_markup=InlineKeyboardMarkup(row_width=1).add(
+            InlineKeyboardButton(text="Сохранить в базу", callback_data="save__")))
     await state.finish()
+    await message.answer("Сделано, жду команд!")
 
 
 # Машина состояний для translateAPI________________________________________________
@@ -173,8 +177,11 @@ async def load_subj_sm_translate(message: types.Message, state: FSMContext):
     await FSMTranslate.next()
     await message.answer("Okey, я запомнил. Произвожу поиск ...")
     async with state.proxy() as data:
-        await message.answer(translate_req(data['phrase']))
+        await bot.send_animation(message.from_user.id, translate_req(data['phrase']),
+                                 reply_markup=InlineKeyboardMarkup(row_width=1).add(
+                                     InlineKeyboardButton(text="Сохранить в базу", callback_data="save__")))
     await state.finish()
+    await message.answer("Сделано, жду команд!")
 
 
 # trendAPI_________________________________________________________________
@@ -186,8 +193,10 @@ async def trand_api(message: types.Message):
     gifs.clear()
     gifs = trend_req()
     for item in gifs.items():
-        await message.answer(item[1], reply_markup=InlineKeyboardMarkup(row_width=2).add(
-            InlineKeyboardButton(text='Сохранить', callback_data=f'save_{item[0]}')))
+        await bot.send_animation(message.from_user.id, item[1],
+                                 reply_markup=InlineKeyboardMarkup(row_width=1).add(
+                                     InlineKeyboardButton(text="Сохранить в базу", callback_data="save__")))
+    await message.answer("Сделано, жду команд!")
 
 
 @dp.callback_query_handler(Text(startswith="save_"))
