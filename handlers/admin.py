@@ -39,7 +39,7 @@ async def colaback_hendler_show_list_category(collback: types.CallbackQuery):
     await collback.answer(f'Выбрана категория {res}')
     gifs_from_tenor_list = get_category_list_tenor_req(res)
     for gif in gifs_from_tenor_list:
-        await bot.send_message(collback.from_user.id, gif)
+        await bot.send_animation(collback.from_user.id, gif)
 
 
 class FSMSearch(StatesGroup):
