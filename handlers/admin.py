@@ -12,15 +12,12 @@ from aiogram.utils.markdown import text, italic, bold
 
 
 
-
-
 gifs = dict()
 dbase = DBase()
 storage = MemoryStorage()
 leng_type = ""
 leng_phrase = ""
 teg_list = []
-
 
 
 @dp.message_handler(Text(equals="Популярные категории", ignore_case=True), state=None)
