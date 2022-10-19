@@ -76,8 +76,8 @@ async def show_type_category_callback_hendler(collback: types.CallbackQuery):
             inline_keyboard_category.add(
                 InlineKeyboardButton(text=f'{teg["searchterm"]}', callback_data=f'category__{teg["searchterm"]}'))
 
-        await bot.send_message(callback_user_id, bold('Вот что получилось. Выбирайте!'),
-                               parse_mode=ParseMode.MARKDOWN,
+        await bot.send_message(callback_user_id,
+                               'В каждой категории по несколько вариантов популярных гифок. Нажмите на любую для просмотра.',
                                reply_markup=inline_keyboard_category)
         await collback.answer()
     else:
@@ -90,6 +90,7 @@ async def show_type_category_callback_hendler(collback: types.CallbackQuery):
                 animation=category_one["image"],
                 reply_markup=keyboard
             )
+
 
 @dp.callback_query_handler(categories_callback.filter())
 async def paginate_category_callback_handler(query: CallbackQuery, callback_data: dict):
@@ -305,8 +306,10 @@ async def colaback_hendler(collback: types.CallbackQuery):
 
 
 def register_handlers_admin(dp: Dispatcher):
-    dp.register_message_handler(category_index_handler, Text(equals="Популярные категории", ignore_case=True), state=None)
-    dp.register_callback_query_handler(show_type_category_callback_hendler, Text(startswith="collect_cat__"), state=None)
+    dp.register_message_handler(category_index_handler, Text(equals="Популярные категории", ignore_case=True),
+                                state=None)
+    dp.register_callback_query_handler(show_type_category_callback_hendler, Text(startswith="collect_cat__"),
+                                       state=None)
     dp.register_callback_query_handler(paginate_category_callback_handler, categories_callback.filter())
     dp.register_callback_query_handler(show_list_category_colaback_hendler, Text(startswith="category__"), state=None)
 
