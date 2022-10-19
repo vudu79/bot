@@ -21,6 +21,6 @@ english_button = InlineKeyboardButton(text="English", callback_data="leng__engl_
 inline_keyboard_lang.row(rus_button, english_button)
 
 inline_keyboard_category = InlineKeyboardMarkup(row_width=3)
-
+inline_keyboard_category.
 
 

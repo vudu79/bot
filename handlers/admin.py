@@ -73,7 +73,7 @@ async def show_type_category_callback_hendler(collback: types.CallbackQuery):
     res = collback.data.split("__")[1]
     if res == "yes":
         for teg in category_list:
-            inline_keyboard_category.add(
+            inline_keyboard_category.insert(
                 InlineKeyboardButton(text=f'{teg["searchterm"]}', callback_data=f'category__{teg["searchterm"]}'))
 
         await bot.send_message(callback_user_id,
