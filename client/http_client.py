@@ -41,14 +41,15 @@ def trend_req():
     return dic
 
 def get_categories_tenor_req():
-    sess = requests.Session()
+    # sess = requests.Session()
     url = f'{server_url}/categories'
-    resp = sess.get(url)
+    resp = requests.get(url)
     res = resp.json()
     return res
 
 def get_category_list_tenor_req(category):
     sess = requests.Session()
+    print(category)
     url = f'{server_url}/category/{category}'
     resp = sess.get(url)
     res = resp.json()
