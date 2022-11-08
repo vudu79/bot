@@ -62,8 +62,8 @@ async def prazdnik_index_handler(message: types.Message):
     await bot.send_message(message.from_user.id,
                            "Большой выбор открыток на любые праздники!!!",
                            reply_markup=InlineKeyboardMarkup(row_width=2).row(
-                               InlineKeyboardButton(text="Сегодня", callback_data="today_holiday"),
-                               InlineKeyboardButton(text="Календарь", callback_data="calendar_holiday")))
+                               InlineKeyboardButton(text="Сегодня", callback_data="holiday__today_"),
+                               InlineKeyboardButton(text="Календарь", callback_data="holiday__calendar_")))
 
 
 @dp.message_handler(Text(equals="Популярные категории", ignore_case=True), state=None)
@@ -75,8 +75,26 @@ async def category_index_handler(message: types.Message):
                                InlineKeyboardButton(text="По одной", callback_data="collect_cat__no")))
 
 
+@dp.callback_query_handler(Text(startswith="holiday__"), state=None)
+async def show_type_holiday_callback_handler(collback: types.CallbackQuery):
+    callback_user_id = collback.from_user.id
+    res = collback.data.split("__")[1]
+    if res == "calendar_":
+        for month in calendar_dict.keys():
+            inline_keyboard_category.insert(
+                InlineKeyboardButton(text=f'{month}', callback_data=f'month__{month}'))
+
+        await bot.send_message(callback_user_id,
+                               'Выберите месяц и дату...',
+                               reply_markup=inline_keyboard_category)
+        await collback.answer()
+    else:
+        if res == "today_":
+            pass
+
+
 @dp.callback_query_handler(Text(startswith="collect_cat__"), state=None)
-async def show_type_category_callback_hendler(collback: types.CallbackQuery):
+async def show_type_category_callback_handler(collback: types.CallbackQuery):
     callback_user_id = collback.from_user.id
     res = collback.data.split("__")[1]
     if res == "yes":
@@ -296,10 +314,16 @@ async def colaback_hendler(collback: types.CallbackQuery):
 
 
 def register_handlers_admin(dp: Dispatcher):
+    dp.register_message_handler(prazdnik_index_handler, Text(equals="Открытки на праздники", ignore_case=True),
+                                state=None),
     dp.register_message_handler(category_index_handler, Text(equals="Популярные категории", ignore_case=True),
                                 state=None)
-    dp.register_callback_query_handler(show_type_category_callback_hendler, Text(startswith="collect_cat__"),
+
+    dp.register_callback_query_handler(show_type_holiday_callback_handler, Text(startswith="holiday__"), state=None)
+
+    dp.register_callback_query_handler(show_type_category_callback_handler, Text(startswith="collect_cat__"),
                                        state=None)
+
     dp.register_callback_query_handler(paginate_category_callback_handler, categories_callback.filter())
     dp.register_callback_query_handler(show_list_category_colaback_hendler, Text(startswith="category__"), state=None)
 
