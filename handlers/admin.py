@@ -12,7 +12,7 @@ from create_bot import dp, bot, calendar_dict
 from client.http_client import *
 from database import DBase
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from keyboards import inline_keyboard_lang, inline_keyboard_category
+from keyboards import inline_keyboard_lang
 
 gifs = dict()
 dbase = DBase()
@@ -81,13 +81,14 @@ async def show_type_holiday_callback_handler(collback: types.CallbackQuery):
     res = collback.data.split("__")[1]
     if res == "calendar_":
         for month in calendar_dict.keys():
-            inline_keyboard_category.clean()
-            inline_keyboard_category.insert(
+            inline_keyboard_holiday = InlineKeyboardMarkup(row_width=3)
+            inline_keyboard_holiday.clean()
+            inline_keyboard_holiday.insert(
                 InlineKeyboardButton(text=f'{month}', callback_data=f'month__{month}'))
 
         await bot.send_message(callback_user_id,
                                'Выберите месяц...',
-                               reply_markup=inline_keyboard_category)
+                               reply_markup=inline_keyboard_holiday)
         await collback.answer()
     else:
         if res == "today_":
@@ -100,6 +101,8 @@ async def show_type_category_callback_handler(collback: types.CallbackQuery):
     res = collback.data.split("__")[1]
     if res == "yes":
         for teg in category_list:
+            inline_keyboard_category = InlineKeyboardMarkup(row_width=3)
+            inline_keyboard_category.clean()
             inline_keyboard_category.insert(
                 InlineKeyboardButton(text=f'{teg["searchterm"]}', callback_data=f'category__{teg["searchterm"]}'))
 
