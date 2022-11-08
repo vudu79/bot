@@ -8,7 +8,7 @@ from aiogram import types, Dispatcher
 from aiogram.utils.callback_data import CallbackData
 from aiogram.utils.exceptions import RetryAfter
 
-from create_bot import dp, bot
+from create_bot import dp, bot, calendar_dict
 from client.http_client import *
 from database import DBase
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
