@@ -7,11 +7,12 @@ translate_btn = KeyboardButton('Гифка под фразу')
 category_btn = KeyboardButton('Популярные категории')
 
 cansel_btn = KeyboardButton('Отменить поиск')
+prazdniki_btn = KeyboardButton('Открытки на праздники')
 
 # translate_btn = KeyboardButton('поделится номером телефона', request_contact=True)
 # translate_btn = KeyboardButton('дать свою локацию', request_location=True)
 reply_keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-reply_keyboard.row(category_btn).row(search_btn, translate_btn).row(random_btn, trend_btn).row(cansel_btn)
+reply_keyboard.row(category_btn,prazdniki_btn).row(search_btn, translate_btn).row(random_btn, trend_btn).row(cansel_btn)
 
 
 inline_keyboard_lang = InlineKeyboardMarkup(row_width=2)

@@ -14,7 +14,6 @@ from database import DBase
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from keyboards import inline_keyboard_lang, inline_keyboard_category
 
-
 gifs = dict()
 dbase = DBase()
 storage = MemoryStorage()
@@ -56,6 +55,15 @@ def get_pagination_keyboard(page: int = 0) -> InlineKeyboardMarkup:
         )
 
     return keyboard
+
+
+@dp.message_handler(Text(equals="Открытки на праздники", ignore_case=True), state=None)
+async def prazdnik_index_handler(message: types.Message):
+    await bot.send_message(message.from_user.id,
+                           "Большой выбор открыток на любые праздники!!!",
+                           reply_markup=InlineKeyboardMarkup(row_width=2).row(
+                               InlineKeyboardButton(text="Сегодня", callback_data="today_holiday"),
+                               InlineKeyboardButton(text="Календарь", callback_data="calendar_holiday")))
 
 
 @dp.message_handler(Text(equals="Популярные категории", ignore_case=True), state=None)
@@ -118,7 +126,6 @@ async def show_list_category_colaback_hendler(collback: types.CallbackQuery):
         except RetryAfter as e:
             await asyncio.sleep(e.timeout)
     await collback.answer()
-
 
 
 class FSMSearch(StatesGroup):
@@ -278,7 +285,6 @@ async def trand_api(message: types.Message):
                                  reply_markup=InlineKeyboardMarkup(row_width=1).add(
                                      InlineKeyboardButton(text="Сохранить в базу", callback_data="save__")))
     await message.answer("Сделано, жду команд!")
-
 
 
 @dp.callback_query_handler(Text(startswith="save_"))
