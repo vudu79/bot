@@ -80,8 +80,9 @@ async def show_type_holiday_callback_handler(collback: types.CallbackQuery):
     callback_user_id = collback.from_user.id
     res = collback.data.split("__")[1]
     if res == "calendar_":
+        inline_keyboard_holiday = InlineKeyboardMarkup(row_width=3)
         for month in calendar_dict.keys():
-            inline_keyboard_holiday = InlineKeyboardMarkup(row_width=3)
+
             inline_keyboard_holiday.clean()
             inline_keyboard_holiday.insert(
                 InlineKeyboardButton(text=f'{month}', callback_data=f'month__{month}'))
@@ -100,8 +101,8 @@ async def show_type_category_callback_handler(collback: types.CallbackQuery):
     callback_user_id = collback.from_user.id
     res = collback.data.split("__")[1]
     if res == "yes":
+        inline_keyboard_category = InlineKeyboardMarkup(row_width=3)
         for teg in category_list:
-            inline_keyboard_category = InlineKeyboardMarkup(row_width=3)
             inline_keyboard_category.clean()
             inline_keyboard_category.insert(
                 InlineKeyboardButton(text=f'{teg["searchterm"]}', callback_data=f'category__{teg["searchterm"]}'))

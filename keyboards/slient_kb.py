@@ -24,4 +24,3 @@ inline_keyboard_lang.row(rus_button, english_button)
 
 
 
-
