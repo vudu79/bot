@@ -81,11 +81,12 @@ async def show_type_holiday_callback_handler(collback: types.CallbackQuery):
     res = collback.data.split("__")[1]
     if res == "calendar_":
         for month in calendar_dict.keys():
+            inline_keyboard_category.clean()
             inline_keyboard_category.insert(
                 InlineKeyboardButton(text=f'{month}', callback_data=f'month__{month}'))
 
         await bot.send_message(callback_user_id,
-                               'Выберите месяц и дату...',
+                               'Выберите месяц...',
                                reply_markup=inline_keyboard_category)
         await collback.answer()
     else:
