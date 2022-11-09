@@ -106,7 +106,7 @@ async def show_month_events_callback_handler(collback: types.CallbackQuery):
     for event in events_list:
         inline_keyboard_events.clean()
         inline_keyboard_events.insert(
-            InlineKeyboardButton(text=f'{event}', callback_data=f'event__'))
+            InlineKeyboardButton(text=f'{event}', callback_data=f'ev_{month}_{hash(event)}'))
 
     await bot.send_message(callback_user_id,
                            'Выберите месяц...',
