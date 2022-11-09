@@ -99,19 +99,44 @@ async def show_type_holiday_callback_handler(collback: types.CallbackQuery):
 async def show_month_events_callback_handler(collback: types.CallbackQuery):
     callback_user_id = collback.from_user.id
     month = collback.data.split("__")[1]
-
     events_list = calendar_dict[month].keys()
 
     inline_keyboard_events = InlineKeyboardMarkup(row_width=1)
     for event in events_list:
         inline_keyboard_events.clean()
         inline_keyboard_events.insert(
-            InlineKeyboardButton(text=f'{event}', callback_data=f'ev_{month}_{hash(event)}'))
+            InlineKeyboardButton(text=f'{event}', callback_data=f'&ev_{month}_{str(hash(event))}'))
 
     await bot.send_message(callback_user_id,
                            'Выберите месяц...',
                            reply_markup=inline_keyboard_events)
     await collback.answer()
+
+@dp.callback_query_handler(Text(startswith="&ev_"), state=None)
+async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
+    callback_user_id = collback.from_user.id
+    month = collback.data.split("_")[1]
+    event_hash = collback.data.split("_")[2]
+
+    events_list = calendar_dict[month].keys()
+    img_list = list()
+    holiday = "???"
+    for event in events_list:
+        if event_hash == str(hash(event)):
+                img_list = calendar_dict[month][event]
+                holiday = event
+
+    await collback.answer(f'Выбран праздник {holiday}')
+
+    for img in img_list:
+        try:
+            await bot.send_animation(callback_user_id, img)
+        except RetryAfter as e:
+            await asyncio.sleep(e.timeout)
+    await collback.answer()
+
+
+
 
 
 
@@ -346,6 +371,8 @@ def register_handlers_admin(dp: Dispatcher):
     dp.register_callback_query_handler(show_type_holiday_callback_handler, Text(startswith="holiday__"), state=None)
 
     dp.register_callback_query_handler(show_month_events_callback_handler, Text(startswith="month__"), state=None)
+
+    dp.register_callback_query_handler(show_event_images_colaback_hendler, Text(startswith="&ev_"), state=None)
 
     dp.register_callback_query_handler(show_type_category_callback_handler, Text(startswith="collect_cat__"),
                                        state=None)
