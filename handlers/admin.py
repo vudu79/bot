@@ -95,6 +95,25 @@ async def show_type_holiday_callback_handler(collback: types.CallbackQuery):
         if res == "today_":
             pass
 
+@dp.callback_query_handler(Text(startswith="month__"), state=None)
+async def show_month_events_callback_handler(collback: types.CallbackQuery):
+    callback_user_id = collback.from_user.id
+    month = collback.data.split("__")[1]
+
+    events_list = calendar_dict[month].keys()
+
+    inline_keyboard_events = InlineKeyboardMarkup(row_width=1)
+    for event in events_list:
+        inline_keyboard_events.clean()
+        inline_keyboard_events.insert(
+            InlineKeyboardButton(text=f'{event}', callback_data=f'event__{event}'))
+
+    await bot.send_message(callback_user_id,
+                           'Выберите месяц...',
+                           reply_markup=inline_keyboard_events)
+    await collback.answer()
+
+
 
 @dp.callback_query_handler(Text(startswith="collect_cat__"), state=None)
 async def show_type_category_callback_handler(collback: types.CallbackQuery):
@@ -325,6 +344,8 @@ def register_handlers_admin(dp: Dispatcher):
                                 state=None)
 
     dp.register_callback_query_handler(show_type_holiday_callback_handler, Text(startswith="holiday__"), state=None)
+
+    dp.register_callback_query_handler(show_month_events_callback_handler, Text(startswith="month__"), state=None)
 
     dp.register_callback_query_handler(show_type_category_callback_handler, Text(startswith="collect_cat__"),
                                        state=None)
