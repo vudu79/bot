@@ -1,4 +1,5 @@
 import asyncio
+import shutil
 
 from aiogram.dispatcher import FSMContext
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
@@ -131,10 +132,12 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
     media = types.MediaGroup()
 
     for img_url in img_list:
-        r = requests.get(img_url, stream=True)
-        if r.status_code == 200:
-            img = r.raw.read()
-            media.attach_photo(types.InputFile(img), 'Превосходная фотография')
+        res = requests.get(img_url, stream=True)
+        if res.status_code == 200:
+            with open("temp_img.jpg", 'wb') as f:
+                shutil.copyfileobj(res.raw, f)
+            media.attach_photo(types.InputFile("temp_img.jpg"), 'Превосходная фотография')
+            os.remove("temp_img.jpg")
     try:
         await bot.send_media_group(callback_user_id, media=media)
     except RetryAfter as e:
