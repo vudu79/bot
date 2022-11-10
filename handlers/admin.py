@@ -106,6 +106,7 @@ async def show_type_holiday_callback_handler(collback: types.CallbackQuery):
                         inline_keyboard_today_events.insert(
                             InlineKeyboardButton(text=f'{event}', callback_data=f'&ev_{month}_{str(hash(event))}'))
 
+
             await bot.send_message(callback_user_id,
                                    'Выберите праздник.',
                                    reply_markup=inline_keyboard_today_events)
