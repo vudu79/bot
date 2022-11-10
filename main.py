@@ -1,3 +1,4 @@
+import json
 import logging, os
 import multiprocessing
 from handlers import client, admin, other
@@ -31,6 +32,8 @@ admin.register_handlers_admin(dp)
 other.register_handlers_other(dp)
 
 if __name__ == '__main__':
+
+
     logging.basicConfig(level=logging.INFO)
 
     #

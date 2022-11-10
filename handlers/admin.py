@@ -8,12 +8,11 @@ from aiogram import types, Dispatcher
 from aiogram.utils.callback_data import CallbackData
 from aiogram.utils.exceptions import RetryAfter
 
-from create_bot import dp, bot
+from create_bot import dp, bot, calendar_dict
 from client.http_client import *
 from database import DBase
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from keyboards import inline_keyboard_lang, inline_keyboard_category
-
+from keyboards import inline_keyboard_lang
 
 gifs = dict()
 dbase = DBase()
@@ -58,6 +57,15 @@ def get_pagination_keyboard(page: int = 0) -> InlineKeyboardMarkup:
     return keyboard
 
 
+@dp.message_handler(Text(equals="Открытки на праздники", ignore_case=True), state=None)
+async def prazdnik_index_handler(message: types.Message):
+    await bot.send_message(message.from_user.id,
+                           "Большой выбор открыток на любые праздники!!!",
+                           reply_markup=InlineKeyboardMarkup(row_width=2).row(
+                               InlineKeyboardButton(text="Сегодня", callback_data="holiday__today_"),
+                               InlineKeyboardButton(text="Календарь", callback_data="holiday__calendar_")))
+
+
 @dp.message_handler(Text(equals="Популярные категории", ignore_case=True), state=None)
 async def category_index_handler(message: types.Message):
     await bot.send_message(message.from_user.id,
@@ -67,12 +75,79 @@ async def category_index_handler(message: types.Message):
                                InlineKeyboardButton(text="По одной", callback_data="collect_cat__no")))
 
 
+@dp.callback_query_handler(Text(startswith="holiday__"), state=None)
+async def show_type_holiday_callback_handler(collback: types.CallbackQuery):
+    callback_user_id = collback.from_user.id
+    res = collback.data.split("__")[1]
+    if res == "calendar_":
+        inline_keyboard_holiday = InlineKeyboardMarkup(row_width=3)
+        for month in calendar_dict.keys():
+
+            inline_keyboard_holiday.clean()
+            inline_keyboard_holiday.insert(
+                InlineKeyboardButton(text=f'{month}', callback_data=f'month__{month}'))
+
+        await bot.send_message(callback_user_id,
+                               'Выберите месяц...',
+                               reply_markup=inline_keyboard_holiday)
+        await collback.answer()
+    else:
+        if res == "today_":
+            pass
+
+@dp.callback_query_handler(Text(startswith="month__"), state=None)
+async def show_month_events_callback_handler(collback: types.CallbackQuery):
+    callback_user_id = collback.from_user.id
+    month = collback.data.split("__")[1]
+    events_list = calendar_dict[month].keys()
+
+    inline_keyboard_events = InlineKeyboardMarkup(row_width=1)
+    for event in events_list:
+        inline_keyboard_events.clean()
+        inline_keyboard_events.insert(
+            InlineKeyboardButton(text=f'{event}', callback_data=f'&ev_{month}_{str(hash(event))}'))
+
+    await bot.send_message(callback_user_id,
+                           'Выберите месяц...',
+                           reply_markup=inline_keyboard_events)
+    await collback.answer()
+
+@dp.callback_query_handler(Text(startswith="&ev_"), state=None)
+async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
+    callback_user_id = collback.from_user.id
+    month = collback.data.split("_")[1]
+    event_hash = collback.data.split("_")[2]
+
+    events_list = calendar_dict[month].keys()
+    img_list = list()
+    holiday = "???"
+    for event in events_list:
+        if event_hash == str(hash(event)):
+                img_list = calendar_dict[month][event]
+                holiday = event
+
+    await collback.answer(f'Выбран праздник {holiday}')
+
+    for img in img_list:
+        try:
+            await bot.send_animation(callback_user_id, img)
+        except RetryAfter as e:
+            await asyncio.sleep(e.timeout)
+    await collback.answer()
+
+
+
+
+
+
 @dp.callback_query_handler(Text(startswith="collect_cat__"), state=None)
-async def show_type_category_callback_hendler(collback: types.CallbackQuery):
+async def show_type_category_callback_handler(collback: types.CallbackQuery):
     callback_user_id = collback.from_user.id
     res = collback.data.split("__")[1]
     if res == "yes":
+        inline_keyboard_category = InlineKeyboardMarkup(row_width=3)
         for teg in category_list:
+            inline_keyboard_category.clean()
             inline_keyboard_category.insert(
                 InlineKeyboardButton(text=f'{teg["searchterm"]}', callback_data=f'category__{teg["searchterm"]}'))
 
@@ -118,7 +193,6 @@ async def show_list_category_colaback_hendler(collback: types.CallbackQuery):
         except RetryAfter as e:
             await asyncio.sleep(e.timeout)
     await collback.answer()
-
 
 
 class FSMSearch(StatesGroup):
@@ -280,7 +354,6 @@ async def trand_api(message: types.Message):
     await message.answer("Сделано, жду команд!")
 
 
-
 @dp.callback_query_handler(Text(startswith="save_"))
 async def colaback_hendler(collback: types.CallbackQuery):
     res = collback.data.split("_")[1]
@@ -290,10 +363,20 @@ async def colaback_hendler(collback: types.CallbackQuery):
 
 
 def register_handlers_admin(dp: Dispatcher):
+    dp.register_message_handler(prazdnik_index_handler, Text(equals="Открытки на праздники", ignore_case=True),
+                                state=None),
     dp.register_message_handler(category_index_handler, Text(equals="Популярные категории", ignore_case=True),
                                 state=None)
-    dp.register_callback_query_handler(show_type_category_callback_hendler, Text(startswith="collect_cat__"),
+
+    dp.register_callback_query_handler(show_type_holiday_callback_handler, Text(startswith="holiday__"), state=None)
+
+    dp.register_callback_query_handler(show_month_events_callback_handler, Text(startswith="month__"), state=None)
+
+    dp.register_callback_query_handler(show_event_images_colaback_hendler, Text(startswith="&ev_"), state=None)
+
+    dp.register_callback_query_handler(show_type_category_callback_handler, Text(startswith="collect_cat__"),
                                        state=None)
+
     dp.register_callback_query_handler(paginate_category_callback_handler, categories_callback.filter())
     dp.register_callback_query_handler(show_list_category_colaback_hendler, Text(startswith="category__"), state=None)
 
