@@ -130,7 +130,7 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
 
     for img in img_list:
         try:
-            await bot.send_animation(callback_user_id, img)
+            await bot.send_animation(callback_user_id, img, width=300, height=300)
         except RetryAfter as e:
             await asyncio.sleep(e.timeout)
     await collback.answer()
