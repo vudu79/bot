@@ -96,7 +96,7 @@ async def show_type_holiday_callback_handler(collback: types.CallbackQuery):
         if res == "today_":
             inline_keyboard_today_events = InlineKeyboardMarkup(row_width=1)
 
-            today = datetime.today().strftime("%-d-%m")
+            today = datetime.today().strftime("%-d.%m")
 
             for month in calendar_dict.keys():
                 event_list = calendar_dict[month].keys()
