@@ -1,5 +1,6 @@
 import asyncio
 import shutil
+from datetime import datetime
 
 from aiogram.dispatcher import FSMContext
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
@@ -83,7 +84,6 @@ async def show_type_holiday_callback_handler(collback: types.CallbackQuery):
     if res == "calendar_":
         inline_keyboard_holiday = InlineKeyboardMarkup(row_width=3)
         for month in calendar_dict.keys():
-
             inline_keyboard_holiday.clean()
             inline_keyboard_holiday.insert(
                 InlineKeyboardButton(text=f'{month}', callback_data=f'month__{month}'))
@@ -94,7 +94,22 @@ async def show_type_holiday_callback_handler(collback: types.CallbackQuery):
         await collback.answer()
     else:
         if res == "today_":
-            pass
+            inline_keyboard_today_events = InlineKeyboardMarkup(row_width=1)
+
+            today = datetime.today().strftime("%-d-%m")
+
+            for month in calendar_dict.keys():
+                event_list = calendar_dict[month].keys()
+                for event in event_list:
+                    if event.startswith(today):
+                        inline_keyboard_today_events.clean()
+                        inline_keyboard_today_events.insert(
+                            InlineKeyboardButton(text=f'{event}', callback_data=f'&ev_{month}_{str(hash(event))}'))
+
+            await bot.send_message(callback_user_id,
+                                   'Выберите праздник.',
+                                   reply_markup=inline_keyboard_today_events)
+
 
 @dp.callback_query_handler(Text(startswith="month__"), state=None)
 async def show_month_events_callback_handler(collback: types.CallbackQuery):
@@ -113,6 +128,7 @@ async def show_month_events_callback_handler(collback: types.CallbackQuery):
                            reply_markup=inline_keyboard_events)
     await collback.answer()
 
+
 @dp.callback_query_handler(Text(startswith="&ev_"), state=None)
 async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
     callback_user_id = collback.from_user.id
@@ -124,10 +140,11 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
     holiday = "???"
     for event in events_list:
         if event_hash == str(hash(event)):
-                img_list = calendar_dict[month][event]
-                holiday = event
+            img_list = calendar_dict[month][event]
+            holiday = event
 
     await collback.answer(f'Выбран праздник {holiday}')
+    await bot.send_message(callback_user_id, "Минутку собираю коллаж...")
 
     media = types.MediaGroup()
 
@@ -143,10 +160,6 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
     except RetryAfter as e:
         await asyncio.sleep(e.timeout)
     await collback.answer()
-
-
-
-
 
 
 @dp.callback_query_handler(Text(startswith="collect_cat__"), state=None)
