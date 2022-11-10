@@ -128,11 +128,12 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
 
     await collback.answer(f'Выбран праздник {holiday}')
 
-    media_list = list()
+    media = types.MediaGroup()
+
     for img in img_list:
-        media_list.append(img)
+        media.attach_photo(types.InputFile(img), 'Превосходная фотография')
     try:
-        await bot.send_media_group(callback_user_id, media_list)
+        await bot.send_media_group(callback_user_id, media=media)
     except RetryAfter as e:
         await asyncio.sleep(e.timeout)
     await collback.answer()
