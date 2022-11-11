@@ -98,17 +98,17 @@ async def show_type_holiday_callback_handler(collback: types.CallbackQuery):
             inline_keyboard_today_events = InlineKeyboardMarkup(row_width=1)
 
             today = datetime.today().strftime("%-d.%m")
-
+            count = 0
             for month in calendar_dict.keys():
                 event_list = calendar_dict[month].keys()
                 for event in event_list:
                     if event.startswith(today):
+                        count = count + 1
                         inline_keyboard_today_events.clean()
                         inline_keyboard_today_events.insert(
                             InlineKeyboardButton(text=f'{event}', callback_data=f'&ev_{month}_{str(hash(event))}'))
 
-            values = len(inline_keyboard_today_events.values.items())
-            if values > 0:
+            if count > 0:
                 await bot.send_message(callback_user_id,
                                    'Выберите праздник.',
                                    reply_markup=inline_keyboard_today_events)
