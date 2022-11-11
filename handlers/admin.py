@@ -1,5 +1,6 @@
 import asyncio
 import shutil
+import time
 from datetime import datetime
 
 from aiogram.dispatcher import FSMContext
@@ -151,6 +152,7 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
 
     for img_url in img_list:
         res = requests.get(img_url, stream=True)
+        time.sleep(0.2)
         if res.status_code == 200:
             with open("temp_img.jpg", 'wb') as f:
                 shutil.copyfileobj(res.raw, f)
