@@ -107,11 +107,14 @@ async def show_type_holiday_callback_handler(collback: types.CallbackQuery):
                         inline_keyboard_today_events.insert(
                             InlineKeyboardButton(text=f'{event}', callback_data=f'&ev_{month}_{str(hash(event))}'))
 
-
-            await bot.send_message(callback_user_id,
+            values = len(inline_keyboard_today_events.values.items())
+            if values > 0:
+                await bot.send_message(callback_user_id,
                                    'Выберите праздник.',
                                    reply_markup=inline_keyboard_today_events)
-
+            else:
+                await bot.send_message(callback_user_id,
+                                       'На сегодня ничего не нашел ((')
 
 @dp.callback_query_handler(Text(startswith="month__"), state=None)
 async def show_month_events_callback_handler(collback: types.CallbackQuery):
@@ -146,7 +149,7 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
             holiday = event
 
     await collback.answer(f'Выбран праздник {holiday}')
-    await bot.send_message(callback_user_id, "Минутку собираю коллаж...")
+    await bot.send_message(callback_user_id, "Минутку собираю варианты для галереи...")
 
     media = types.MediaGroup()
 
