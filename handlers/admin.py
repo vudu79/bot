@@ -161,6 +161,7 @@ def get_media(urls, media_group):
 
 @dp.callback_query_handler(Text(startswith="&ev_"), state=None)
 async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
+
     callback_user_id = collback.from_user.id
     month = collback.data.split("_")[1]
     event_hash = collback.data.split("_")[2]
@@ -177,7 +178,6 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
     await bot.send_message(callback_user_id, "Минутку собираю варианты для галереи...")
 
     media = types.MediaGroup()
-
     if len(img_list) > 10:
         for media in get_media(img_list, media):
             try:
@@ -194,7 +194,11 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
                     shutil.copyfileobj(res.raw, f)
                 media.attach_photo(types.InputFile("temp_img.jpg"), 'Превосходная фотография')
                 os.remove("temp_img.jpg")
-
+        try:
+            await bot.send_media_group(callback_user_id, media=media)
+        except RetryAfter as e:
+            await asyncio.sleep(e.timeout)
+        await collback.answer()
 
 
 
