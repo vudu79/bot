@@ -110,11 +110,12 @@ async def show_type_holiday_callback_handler(collback: types.CallbackQuery):
 
             if count > 0:
                 await bot.send_message(callback_user_id,
-                                   'Выберите праздник.',
-                                   reply_markup=inline_keyboard_today_events)
+                                       'Выберите праздник.',
+                                       reply_markup=inline_keyboard_today_events)
             else:
                 await bot.send_message(callback_user_id,
                                        'На сегодня ничего не нашел ((')
+
 
 @dp.callback_query_handler(Text(startswith="month__"), state=None)
 async def show_month_events_callback_handler(collback: types.CallbackQuery):
@@ -134,6 +135,28 @@ async def show_month_events_callback_handler(collback: types.CallbackQuery):
     await collback.answer()
 
 
+
+def get_media(urls):
+    media = list()
+    url_gen = (url for url in urls)
+
+    count = 0
+    while count < len(urls):
+        media.clear()
+        for y in range(0, 5):
+            count += 1
+            url = next(url_gen)
+            res = requests.get(url, stream=True)
+            time.sleep(0.2)
+            print(res.status_code)
+            if res.status_code == 200:
+                with open("temp_img.jpg", 'wb') as f:
+                    shutil.copyfileobj(res.raw, f)
+                media.append(url)
+                os.remove("temp_img.jpg")
+        yield media
+
+
 @dp.callback_query_handler(Text(startswith="&ev_"), state=None)
 async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
     callback_user_id = collback.from_user.id
@@ -151,21 +174,14 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
     await collback.answer(f'Выбран праздник {holiday}')
     await bot.send_message(callback_user_id, "Минутку собираю варианты для галереи...")
 
-    media = types.MediaGroup()
+    for media in get_media(img_list):
 
-    for img_url in img_list:
-        res = requests.get(img_url, stream=True)
-        time.sleep(0.2)
-        if res.status_code == 200:
-            with open("temp_img.jpg", 'wb') as f:
-                shutil.copyfileobj(res.raw, f)
-            media.attach_photo(types.InputFile("temp_img.jpg"), 'Превосходная фотография')
-            os.remove("temp_img.jpg")
-    try:
-        await bot.send_media_group(callback_user_id, media=media)
-    except RetryAfter as e:
-        await asyncio.sleep(e.timeout)
-    await collback.answer()
+        try:
+            await bot.send_media_group(callback_user_id, media=media)
+            time.sleep(1)
+        except RetryAfter as e:
+            await asyncio.sleep(e.timeout)
+        await collback.answer()
 
 
 @dp.callback_query_handler(Text(startswith="collect_cat__"), state=None)
