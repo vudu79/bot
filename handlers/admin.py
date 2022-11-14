@@ -11,7 +11,7 @@ from aiogram import types, Dispatcher
 from aiogram.utils.callback_data import CallbackData
 from aiogram.utils.exceptions import RetryAfter
 
-from create_bot import dp, bot, calendar_dict
+from create_bot import dp, bot, calendar_dict, calendar_storage
 from client.http_client import *
 from database import DBase
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -166,7 +166,7 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
     month = collback.data.split("_")[1]
     event_hash = collback.data.split("_")[2]
 
-    events_list = calendar_dict[month].keys()
+    events_list = calendar_storage[month].keys()
     img_list = list()
     holiday = "???"
     for event in events_list:
@@ -178,27 +178,31 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
     await bot.send_message(callback_user_id, "Минутку собираю варианты для галереи...")
 
     media = types.MediaGroup()
-    if len(img_list) > 10:
-        for media in get_media(img_list, media):
-            try:
-                await bot.send_media_group(callback_user_id, media=media)
-            except RetryAfter as e:
-                await asyncio.sleep(e.timeout)
-            await collback.answer()
-    else:
-        for img_url in img_list:
-            res = requests.get(img_url, stream=True)
-            time.sleep(0.2)
-            if res.status_code == 200:
-                with open("temp_img.jpg", 'wb') as f:
-                    shutil.copyfileobj(res.raw, f)
-                media.attach_photo(types.InputFile("temp_img.jpg"), 'Превосходная фотография')
-                os.remove("temp_img.jpg")
-        try:
-            await bot.send_media_group(callback_user_id, media=media)
-        except RetryAfter as e:
-            await asyncio.sleep(e.timeout)
-        await collback.answer()
+
+    for img in img_list:
+        media.attach_photo(types.InputFile(path_or_bytesio=img), 'Превосходная фотография')
+    await bot.send_media_group(callback_user_id, media=media)
+    # if len(img_list) > 10:
+    #     for media in get_media(img_list, media):
+    #         try:
+    #             await bot.send_media_group(callback_user_id, media=media)
+    #         except RetryAfter as e:
+    #             await asyncio.sleep(e.timeout)
+    #         await collback.answer()
+    # else:
+    #     for img_url in img_list:
+    #         res = requests.get(img_url, stream=True)
+    #         time.sleep(0.2)
+    #         if res.status_code == 200:
+    #             with open("temp_img.jpg", 'wb') as f:
+    #                 shutil.copyfileobj(res.raw, f)
+    #             media.attach_photo(types.InputFile("temp_img.jpg"), 'Превосходная фотография')
+    #             os.remove("temp_img.jpg")
+    #     try:
+    #         await bot.send_media_group(callback_user_id, media=media)
+    #     except RetryAfter as e:
+    #         await asyncio.sleep(e.timeout)
+    #     await collback.answer()
 
 
 

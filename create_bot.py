@@ -16,3 +16,9 @@ with open('calendar.json', 'r', encoding='utf-8') as f:
     js = f.read()
 
 calendar_dict = json.loads(js)
+
+
+with open('calendar_storage.json', 'r', encoding='utf-8') as f:
+    js = f.read()
+
+calendar_storage = json.loads(js)
