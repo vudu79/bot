@@ -2,7 +2,8 @@ import os
 
 import requests
 
-server_url = os.getenv("SERVER_URL")
+# server_url = os.getenv("SERVER_URL")
+server_url = "http://45.87.0.215:8080"
 
 def random_req(subj):
     sess = requests.Session()

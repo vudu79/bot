@@ -8,18 +8,15 @@ from aiogram.utils.executor import start_webhook
 from handlers import client, admin, other
 from create_bot import TOKEN, bot, dp
 
-
-
 API_TOKEN = 'BOT_TOKEN_HERE'
 
 # webhook settings
 # WEBHOOK_HOST = 'https://your.domain'
-# WEBHOOK_PATH = '/path/to/api'
-WEBHOOK_URL = " https://451a-185-17-131-112.eu.ngrok.io"
-
+WEBHOOK_PATH = '/'
+WEBHOOK_URL = "https://2c4c-185-17-131-112.eu.ngrok.io"
 # webserver settings
-WEBAPP_HOST = 'localhost'  # or ip
-WEBAPP_PORT = 5000
+WEBAPP_HOST = '127.0.0.1'  # or ip
+WEBAPP_PORT = 3001
 
 logging.basicConfig(level=logging.INFO)
 
@@ -62,16 +59,13 @@ async def on_shutdown(dp):
 if __name__ == '__main__':
     start_webhook(
         dispatcher=dp,
-        webhook_path=WEBHOOK_URL,
+        webhook_path=WEBHOOK_PATH,
         on_startup=on_startup,
         on_shutdown=on_shutdown,
-        skip_updates=True,
+        skip_updates=False,
         host=WEBAPP_HOST,
         port=WEBAPP_PORT,
     )
-
-
-
 
 # import json
 # import logging, os
@@ -112,33 +106,33 @@ if __name__ == '__main__':
 #
 #     logging.basicConfig(level=logging.INFO)
 
-    #
-    # start_webhook(
-    #     dispatcher=dp,
-    #     webhook_path=WEBHOOK_PATH,
-    #     skip_updates=True,
-    #     on_startup=on_startup,
-    #     on_shutdown=on_shutdown,
-    #     host=WEBAPP_HOST,
-    #     port=WEBAPP_PORT,
-    # )
+#
+# start_webhook(
+#     dispatcher=dp,
+#     webhook_path=WEBHOOK_PATH,
+#     skip_updates=True,
+#     on_startup=on_startup,
+#     on_shutdown=on_shutdown,
+#     host=WEBAPP_HOST,
+#     port=WEBAPP_PORT,
+# )
 
-    # kwa1 = {
-    #     "dispatcher": dp,
-    #     "webhook_path": WEBHOOK_PATH,
-    #     "skip_updates": True,
-    #     "on_startup": on_startup,
-    #     "on_shutdown": on_shutdown,
-    #     "host": WEBAPP_HOST,
-    #     "port": WEBAPP_PORT,
-    # }
-    #
-    # kwa2 = {
-    #     "server_class" : HTTPServer,
-    #     "handler_class": HttpGetHandler,
-    # }
+# kwa1 = {
+#     "dispatcher": dp,
+#     "webhook_path": WEBHOOK_PATH,
+#     "skip_updates": True,
+#     "on_startup": on_startup,
+#     "on_shutdown": on_shutdown,
+#     "host": WEBAPP_HOST,
+#     "port": WEBAPP_PORT,
+# }
+#
+# kwa2 = {
+#     "server_class" : HTTPServer,
+#     "handler_class": HttpGetHandler,
+# }
 
-    # p1 = multiprocessing.Process(target=start_webhook, kwargs=kwa1)
-    # p2 = multiprocessing.Process(target=run, kwargs=kwa2)
-    # p1.start()
-    # p2.start()
+# p1 = multiprocessing.Process(target=start_webhook, kwargs=kwa1)
+# p2 = multiprocessing.Process(target=run, kwargs=kwa2)
+# p1.start()
+# p2.start()
