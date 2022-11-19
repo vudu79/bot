@@ -68,6 +68,7 @@ async def bot_start(logger: logging.Logger) -> None:
 
 
 
+
 def setup_env():
     """Настройка переменных окружения"""
     from dotenv import load_dotenv
