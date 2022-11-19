@@ -18,7 +18,7 @@ jobs:
         python-version: "3.8"
     - name: Run environment
       run: |
-        source venvBotPolling/bin/activate
+        source /home/andrey/python/gif_bot/bot_polling/venvBotPolling/bin/activate
     - name: Install dependencies
       run: |
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
