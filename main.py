@@ -76,6 +76,8 @@ def setup_env():
         load_dotenv(dotenv_path)
 
 
+
+
 def main():
     """Функция для запуска через poetry"""
     logger = logging.getLogger(__name__)
