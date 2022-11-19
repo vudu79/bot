@@ -10,14 +10,10 @@ from create_bot import TOKEN, bot, dp
 from echo_server import run, HttpGetHandler, HTTPServer
 
 
-
-
-
 #
 # if __name__ == '__main__':
 #     logging.basicConfig(level=logging.INFO)
 #     dp.start_polling()
-
 
 
 async def bot_start(logger: logging.Logger) -> None:
@@ -64,9 +60,8 @@ async def bot_start(logger: logging.Logger) -> None:
     # Делегировано alembic
     # await proceed_schemas(async_engine, BaseModel.metadata)
     # await dp.start_polling(bot, session_maker=session_maker, logger=logger, redis=redis)
+
     await dp.start_polling(bot)
-
-
 
 
 def setup_env():
@@ -76,8 +71,6 @@ def setup_env():
     dotenv_path = path.joinpath('.env')
     if dotenv_path.exists():
         load_dotenv(dotenv_path)
-
-
 
 
 def main():
@@ -93,5 +86,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
