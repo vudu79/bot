@@ -3,12 +3,14 @@ import json
 import logging, os
 import multiprocessing
 import pathlib
-
 from handlers import client, admin, other
-from aiogram.utils.executor import start_webhook
 from create_bot import TOKEN, bot, dp
-from echo_server import run, HttpGetHandler, HTTPServer
 
+
+import asyncio
+import logging
+import os
+import pathlib
 
 #
 # if __name__ == '__main__':
@@ -61,7 +63,7 @@ async def bot_start(logger: logging.Logger) -> None:
     # await proceed_schemas(async_engine, BaseModel.metadata)
     # await dp.start_polling(bot, session_maker=session_maker, logger=logger, redis=redis)
 
-    await dp.start_polling(bot)
+    await dp.start_polling(bot, logger=logger)
 
 
 def setup_env():
