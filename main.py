@@ -67,6 +67,7 @@ async def bot_start(logger: logging.Logger) -> None:
     await dp.start_polling(bot)
 
 
+
 def setup_env():
     """Настройка переменных окружения"""
     from dotenv import load_dotenv
