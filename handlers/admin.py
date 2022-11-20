@@ -170,29 +170,42 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
     events_list = calendar_dict[month].keys()
     img_list = list()
     holiday = "???"
+
     for event in events_list:
         if event_hash == str(hash(event)):
             img_list = calendar_dict[month][event]
             holiday = event
-    print(img_list)
-    # img_generator = (x for x in img_list)
-    # print(f'Герератор -  {img_generator}')
 
-    await collback.answer(f'Выбран праздник {holiday}')
-    await bot.send_message(callback_user_id, "Минутку собираю варианты для галереи...")
+    is_more_ten = bool
 
-    media = types.MediaGroup()
+    if len(img_list) > 0:
+        if len(img_list) >= 10:
+            image_generator = (x for x in img_list)
+            is_more_ten = True
+        else:
+            image_generator = (x for x in img_list)
+            is_more_ten = False
 
-    for img_url in img_list:
-        print(img_url)
-        media.attach_photo(types.InputMediaPhoto(img_url), 'Превосходная фотография')
+        print(img_list)
+        # img_generator = (x for x in img_list)
+        # print(f'Герератор -  {img_generator}')
+
+        await collback.answer(f'Выбран праздник {holiday}')
+        await bot.send_message(callback_user_id, "Минутку собираю варианты для галереи...")
+
+        media = types.MediaGroup()
+
+        for count in range(0, 9):
+            img = next(image_generator)
+            media.attach_photo(types.InputMediaPhoto(img), 'Превосходная фотография')
+
         try:
             await bot.send_media_group(callback_user_id, media=media)
         except RetryAfter as e:
             await asyncio.sleep(e.timeout)
         await collback.answer()
 
-    await bot.send_media_group(callback_user_id, media=media)
+    await collback.answer("К сожелению, для этого праздника открыток нет.")
     # if len(img_list) > 10:
     #     for media in get_media(img_list, media):
     #         try:
