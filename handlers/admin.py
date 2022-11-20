@@ -168,7 +168,7 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
 
     events_list = calendar_storage[month].keys()
     img_list = list()
-    img_generator = any
+    img_generator = (x in range(1, 9))
     holiday = "???"
     for event in events_list:
         if event_hash == str(hash(event)):
@@ -182,7 +182,8 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
     media = types.MediaGroup()
 
     for j in range(0, 9):
-        media.attach_photo(types.InputFile(path_or_bytesio=next(img_generator)), 'Превосходная фотография')
+        img = next(img_generator)
+        media.attach_photo(types.InputFile(path_or_bytesio=img), 'Превосходная фотография')
     await bot.send_media_group(callback_user_id, media=media)
     # if len(img_list) > 10:
     #     for media in get_media(img_list, media):
