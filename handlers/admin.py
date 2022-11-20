@@ -173,7 +173,7 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
         if event_hash == str(hash(event)):
             img_list = calendar_dict[month][event]
             holiday = event
-
+    print(img_list)
     # img_generator = (x for x in img_list)
     # print(f'Герератор -  {img_generator}')
 
@@ -182,11 +182,15 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
 
     media = types.MediaGroup()
 
-    for img in img_list:
-        # img = next(img_generator)
-        print(img)
-        media.attach_photo(types.InputFile(img), 'Превосходная фотография')
+    for img_path in img_list:
+        print(img_path)
+        media.attach_photo(types.InputFile(img_path), 'Превосходная фотография')
 
+        try:
+            await bot.send_media_group(callback_user_id, media=media)
+        except RetryAfter as e:
+            await asyncio.sleep(e.timeout)
+        await collback.answer()
 
     await bot.send_media_group(callback_user_id, media=media)
     # if len(img_list) > 10:
