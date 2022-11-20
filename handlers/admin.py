@@ -181,9 +181,10 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
 
     if len_img_list > 0:
         if len_img_list > 9:
-            len_generator = (len_img_list // 10) + 1
+            len_generator = (len_img_list // 10) + (0 if (len_img_list % 10) == 0 else 1)
             print(f'len_generator - {len_generator}')
-            image_generator = func_chunk(img_list, len_generator)
+            image_generator = func_chunk(img_list, 10)
+            print(f'image_generator - {image_generator}')
             is_more_ten = True
         else:
             image_generator = (x for x in img_list)
