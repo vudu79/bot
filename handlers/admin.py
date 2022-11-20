@@ -187,6 +187,7 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
         print(img)
         media.attach_photo(types.InputFile(img), 'Превосходная фотография')
 
+
     await bot.send_media_group(callback_user_id, media=media)
     # if len(img_list) > 10:
     #     for media in get_media(img_list, media):
