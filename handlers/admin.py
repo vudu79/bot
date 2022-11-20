@@ -168,7 +168,7 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
 
     events_list = calendar_storage[month].keys()
     img_list = list()
-    img_generator = (x in range(1, 9))
+    img_generator = (x for x in range(1, 9))
     holiday = "???"
     for event in events_list:
         if event_hash == str(hash(event)):
