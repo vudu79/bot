@@ -177,7 +177,7 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
     len_generator = 0
 
     if len_img_list > 0:
-        if len_img_list >= 10:
+        if len_img_list > 9:
             len_generator = (len_img_list // 10) + 1
             image_generator = func_chunk(img_list, len_generator)
             is_more_ten = True
@@ -193,48 +193,27 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
         media = types.MediaGroup()
 
         if is_more_ten:
-            for x in range(len_img_list):
+            for x in range(len_generator):
                 for img in next(image_generator):
-                    media.attach_photo(types.InputMediaPhoto(img), 'Превосходная фотография')
+                    if img != "":
+                        media.attach_photo(types.InputMediaPhoto(img), 'Превосходная фотография')
+
                 try:
                     await bot.send_media_group(callback_user_id, media=media)
                 except RetryAfter as e:
                     await asyncio.sleep(e.timeout)
                 await collback.answer()
         else:
-            for count in image_generator:
-                img = next(image_generator)
+            for img in image_generator:
                 media.attach_photo(types.InputMediaPhoto(img), 'Превосходная фотография')
+
             try:
                 await bot.send_media_group(callback_user_id, media=media)
             except RetryAfter as e:
                 await asyncio.sleep(e.timeout)
             await collback.answer()
 
-
     await collback.answer("К сожелению, для этого праздника открыток нет.")
-    # if len(img_list) > 10:
-    #     for media in get_media(img_list, media):
-    #         try:
-    #             await bot.send_media_group(callback_user_id, media=media)
-    #         except RetryAfter as e:
-    #             await asyncio.sleep(e.timeout)
-    #         await collback.answer()
-    # else:
-    #     for img_url in img_list:
-    #         res = requests.get(img_url, stream=True)
-    #         time.sleep(0.2)
-    #         if res.status_code == 200:
-    #             with open("temp_img.jpg", 'wb') as f:
-    #                 shutil.copyfileobj(res.raw, f)
-    #             media.attach_photo(types.InputFile("temp_img.jpg"), 'Превосходная фотография')
-    #             os.remove("temp_img.jpg")
-    #     try:
-    #         await bot.send_media_group(callback_user_id, media=media)
-    #     except RetryAfter as e:
-    #         await asyncio.sleep(e.timeout)
-    #     await collback.answer()
-
 
 @dp.callback_query_handler(Text(startswith="collect_cat__"), state=None)
 async def show_type_category_callback_handler(collback: types.CallbackQuery):
