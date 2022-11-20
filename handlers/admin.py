@@ -1,4 +1,5 @@
 import asyncio
+import random
 import shutil
 import time
 from datetime import datetime
@@ -157,6 +158,7 @@ def func_chunk(lst, n):
 
 @dp.callback_query_handler(Text(startswith="&ev_"), state=None)
 async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
+    phraze_list = ["Склеиваю открытки...", "Ищу в интернетах...)", "Собираю пазл...", "Вспоминаю, что надо было сделать...", "Выгружаю по частям...", "Устал, у меня перерыв..."]
     callback_user_id = collback.from_user.id
     month = collback.data.split("_")[1]
     event_hash = collback.data.split("_")[2]
@@ -190,12 +192,12 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
             image_generator = (x for x in img_list)
             is_more_ten = False
 
-        await bot.send_message(callback_user_id, f'Выбран праздник {holiday.split("-")[1]}. Найдено {len_img_list} шт.')
+        await bot.send_message(callback_user_id, f'Выбран праздник "{holiday.split("-")[1]}". Найдено {len_img_list} шт.')
 
         if is_more_ten:
             for x in range(len_generator):
                 step_list = next(image_generator)
-                await bot.send_message(callback_user_id, f'Минутку собираю {len(step_list)} шт. в галерею...')
+                await bot.send_message(callback_user_id, f'{random.choice(phraze_list)}')
                 media = types.MediaGroup()
                 for img in step_list:
                     if img != "":
