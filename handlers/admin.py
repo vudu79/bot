@@ -174,18 +174,19 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
             img_list = calendar_dict[month][event]
             holiday = event
 
-    img_generator = (x for x in img_list)
-    print(img_generator)
+    # img_generator = (x for x in img_list)
+    # print(f'Герератор -  {img_generator}')
 
     await collback.answer(f'Выбран праздник {holiday}')
     await bot.send_message(callback_user_id, "Минутку собираю варианты для галереи...")
 
     media = types.MediaGroup()
 
-    for j in range(0, 9):
-        img = next(img_generator)
+    for img in img_list:
+        # img = next(img_generator)
         print(img)
         media.attach_photo(types.InputFile(img), 'Превосходная фотография')
+
     await bot.send_media_group(callback_user_id, media=media)
     # if len(img_list) > 10:
     #     for media in get_media(img_list, media):
