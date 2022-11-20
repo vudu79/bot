@@ -166,7 +166,8 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
     month = collback.data.split("_")[1]
     event_hash = collback.data.split("_")[2]
 
-    events_list = calendar_storage[month].keys()
+    # events_list = calendar_storage[month].keys()
+    events_list = calendar_dict[month].keys()
     img_list = list()
     holiday = "???"
     for event in events_list:
@@ -182,10 +183,9 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
 
     media = types.MediaGroup()
 
-    for img_path in img_list:
-        print(img_path)
-        media.attach_photo(types.InputFile(img_path), 'Превосходная фотография')
-
+    for img_url in img_list:
+        print(img_url)
+        media.attach_photo(types.InputMediaPhoto(img_url), 'Превосходная фотография')
         try:
             await bot.send_media_group(callback_user_id, media=media)
         except RetryAfter as e:
