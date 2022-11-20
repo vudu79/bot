@@ -171,21 +171,24 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
             img_list = calendar_dict[month][event]
             holiday = event
 
+    print(f'img_list - {img_list}')
+
     is_more_ten = bool
 
     len_img_list = len(img_list)
+    print(f'len_img_list - {len_img_list}')
     len_generator = 0
 
     if len_img_list > 0:
         if len_img_list > 9:
             len_generator = (len_img_list // 10) + 1
+            print(f'len_generator - {len_generator}')
             image_generator = func_chunk(img_list, len_generator)
             is_more_ten = True
         else:
             image_generator = (x for x in img_list)
             is_more_ten = False
 
-        print(img_list)
 
         await collback.answer(f'Выбран праздник {holiday}')
         await bot.send_message(callback_user_id, "Минутку собираю варианты для галереи...")
@@ -203,7 +206,7 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
                     media.clean()
                 except RetryAfter as e:
                     await asyncio.sleep(e.timeout)
-                await collback.answer()
+
         else:
             for img in image_generator:
                 media.attach_photo(types.InputMediaPhoto(img), 'Превосходная фотография')
@@ -212,7 +215,8 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
                 await bot.send_media_group(callback_user_id, media=media)
             except RetryAfter as e:
                 await asyncio.sleep(e.timeout)
-            await collback.answer()
+
+        await collback.answer()
 
     await collback.answer("К сожелению, для этого праздника открыток нет.")
 
