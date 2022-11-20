@@ -190,18 +190,16 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
             image_generator = (x for x in img_list)
             is_more_ten = False
 
-
-        await collback.answer(f'Выбран праздник {holiday}')
-        await bot.send_message(callback_user_id, "Минутку собираю варианты для галереи...")
-
-
+        await bot.send_message(callback_user_id, f'Выбран праздник {holiday.split("-")[1]}. Найдено {len_img_list} шт.')
 
         if is_more_ten:
             for x in range(len_generator):
+                step_list = next(image_generator)
+                await bot.send_message(callback_user_id, f'Минутку собираю {len(step_list)} шт. в галерею...')
                 media = types.MediaGroup()
-                for img in next(image_generator):
+                for img in step_list:
                     if img != "":
-                        media.attach_photo(types.InputMediaPhoto(img), 'Превосходная фотография')
+                        media.attach_photo(types.InputMediaPhoto(img), f'{holiday.split("-")[1]}')
 
                 try:
                     await bot.send_media_group(callback_user_id, media=media)
@@ -211,7 +209,7 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
         else:
             media = types.MediaGroup()
             for img in image_generator:
-                media.attach_photo(types.InputMediaPhoto(img), 'Превосходная фотография')
+                media.attach_photo(types.InputMediaPhoto(img), f'{holiday.split("-")[1]}')
 
             try:
                 await bot.send_media_group(callback_user_id, media=media)
@@ -220,7 +218,7 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
 
         await collback.answer()
 
-    await collback.answer("К сожелению, для этого праздника открыток нет.")
+    await collback.answer("К сожалению, для этого праздника открыток нет.")
 
 @dp.callback_query_handler(Text(startswith="collect_cat__"), state=None)
 async def show_type_category_callback_handler(collback: types.CallbackQuery):
