@@ -110,11 +110,12 @@ async def show_type_holiday_callback_handler(collback: types.CallbackQuery):
 
             if count > 0:
                 await bot.send_message(callback_user_id,
-                                   'Выберите праздник.',
-                                   reply_markup=inline_keyboard_today_events)
+                                       'Выберите праздник.',
+                                       reply_markup=inline_keyboard_today_events)
             else:
                 await bot.send_message(callback_user_id,
                                        'На сегодня ничего не нашел ((')
+
 
 @dp.callback_query_handler(Text(startswith="month__"), state=None)
 async def show_month_events_callback_handler(collback: types.CallbackQuery):
@@ -161,17 +162,18 @@ def get_media(urls, media_group):
 
 @dp.callback_query_handler(Text(startswith="&ev_"), state=None)
 async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
-
     callback_user_id = collback.from_user.id
     month = collback.data.split("_")[1]
     event_hash = collback.data.split("_")[2]
 
     events_list = calendar_storage[month].keys()
     img_list = list()
+    img_generator = any
     holiday = "???"
     for event in events_list:
         if event_hash == str(hash(event)):
             img_list = calendar_dict[month][event]
+            img_generator = (x for x in img_list)
             holiday = event
 
     await collback.answer(f'Выбран праздник {holiday}')
@@ -179,8 +181,8 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
 
     media = types.MediaGroup()
 
-    for img in img_list:
-        media.attach_photo(types.InputFile(path_or_bytesio=img), 'Превосходная фотография')
+    for j in range(0, 9):
+        media.attach_photo(types.InputFile(path_or_bytesio=next(img_generator)), 'Превосходная фотография')
     await bot.send_media_group(callback_user_id, media=media)
     # if len(img_list) > 10:
     #     for media in get_media(img_list, media):
@@ -203,13 +205,6 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
     #     except RetryAfter as e:
     #         await asyncio.sleep(e.timeout)
     #     await collback.answer()
-
-
-
-
-
-
-
 
 
 @dp.callback_query_handler(Text(startswith="collect_cat__"), state=None)
