@@ -182,7 +182,7 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
     len_generator = 0
 
     if len_img_list > 0:
-        if len_img_list > 9:
+        if len_img_list > 10:
             len_generator = (len_img_list // 10) + (0 if (len_img_list % 10) == 0 else 1)
             print(f'len_generator - {len_generator}')
             image_generator = func_chunk(img_list, 10)
@@ -197,7 +197,7 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
         if is_more_ten:
             for x in range(len_generator):
                 step_list = next(image_generator)
-                await bot.send_message(callback_user_id, f'{random.choice(phraze_list)}')
+                await bot.send_message(callback_user_id, f'{random.choice(phraze_list) if len_img_list > 10 else "Минутку, подбираю открытки..."}')
                 media = types.MediaGroup()
                 for img in step_list:
                     if img != "":
