@@ -16,7 +16,8 @@ from create_bot import dp, bot, calendar_dict, calendar_storage
 from client.http_client import *
 from database import DBase
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from keyboards import inline_keyboard_lang
+from keyboards import reply_keyboard_main_menu, inline_keyboard_lang, reply_keyboard_cards, reply_keyboard_gifs, \
+    reply_keyboard_mems
 
 
 class FSMSearch(StatesGroup):
@@ -72,13 +73,43 @@ def get_pagination_keyboard(page: int = 0) -> InlineKeyboardMarkup:
     return keyboard
 
 
-@dp.message_handler(Text(equals="Открытки на праздники", ignore_case=True), state=None)
-async def prazdnik_index_handler(message: types.Message):
+@dp.message_handler(Text(equals="Мемы", ignore_case=True), state=None)
+async def mems_menu_show_handler(message: types.Message):
+    # await bot.send_message(message.from_user.id,
+    #                        "Более 10000 открыток на праздники!!!",
+    #                        reply_markup=InlineKeyboardMarkup(row_width=2).row(
+    #                            InlineKeyboardButton(text="Сегодня", callback_data="holiday__today_"),
+    #                            InlineKeyboardButton(text="Календарь", callback_data="holiday__calendar_")))
+    await message.delete_reply_markup()
     await bot.send_message(message.from_user.id,
-                           "Большой выбор открыток на любые праздники!!!",
-                           reply_markup=InlineKeyboardMarkup(row_width=2).row(
-                               InlineKeyboardButton(text="Сегодня", callback_data="holiday__today_"),
-                               InlineKeyboardButton(text="Календарь", callback_data="holiday__calendar_")))
+                           "Неприлично много мемов))",
+                           reply_markup=reply_keyboard_mems)
+
+
+@dp.message_handler(Text(equals="Гифки", ignore_case=True), state=None)
+async def gifs_menu_show_handler(message: types.Message):
+    # await bot.send_message(message.from_user.id,
+    #                        "Более 10000 открыток на праздники!!!",
+    #                        reply_markup=InlineKeyboardMarkup(row_width=2).row(
+    #                            InlineKeyboardButton(text="Сегодня", callback_data="holiday__today_"),
+    #                            InlineKeyboardButton(text="Календарь", callback_data="holiday__calendar_")))
+    await message.delete_reply_markup()
+    await bot.send_message(message.from_user.id,
+                           "Помогу найти гифки рызными способами))",
+                           reply_markup=reply_keyboard_gifs)
+
+
+@dp.message_handler(Text(equals="Открытки", ignore_case=True), state=None)
+async def cards_menu_show_handler(message: types.Message):
+    # await bot.send_message(message.from_user.id,
+    #                        "Более 10000 открыток на праздники!!!",
+    #                        reply_markup=InlineKeyboardMarkup(row_width=2).row(
+    #                            InlineKeyboardButton(text="Сегодня", callback_data="holiday__today_"),
+    #                            InlineKeyboardButton(text="Календарь", callback_data="holiday__calendar_")))
+    await message.delete_reply_markup()
+    await bot.send_message(message.from_user.id,
+                           "Более 10000 открыток на праздники!!!",
+                           reply_markup=reply_keyboard_cards)
 
 
 @dp.message_handler(Text(equals="Популярные категории", ignore_case=True), state=None)
@@ -158,7 +189,8 @@ def func_chunk(lst, n):
 
 @dp.callback_query_handler(Text(startswith="&ev_"), state=None)
 async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
-    phraze_list = ["Склеиваю открытки...", "Ищу в интернетах...)", "Собираю пазл...", "Вспоминаю, что надо было сделать...", "Выгружаю по частям...", "Устал, у меня перерыв..."]
+    phraze_list = ["Склеиваю открытки...", "Ищу в интернетах...)", "Собираю пазл...",
+                   "Вспоминаю, что надо было сделать...", "Выгружаю по частям...", "Устал, у меня перерыв..."]
     callback_user_id = collback.from_user.id
     month = collback.data.split("_")[1]
     event_hash = collback.data.split("_")[2]
@@ -192,12 +224,14 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
             image_generator = (x for x in img_list)
             is_more_ten = False
 
-        await bot.send_message(callback_user_id, f'Выбран праздник "{holiday.split("-")[1]}". Найдено {len_img_list} шт.')
+        await bot.send_message(callback_user_id,
+                               f'Выбран праздник "{holiday.split("-")[1]}". Найдено {len_img_list} шт.')
 
         if is_more_ten:
             for x in range(len_generator):
                 step_list = next(image_generator)
-                await bot.send_message(callback_user_id, f'{random.choice(phraze_list) if len_img_list > 10 else "Минутку, подбираю открытки..."}')
+                await bot.send_message(callback_user_id,
+                                       f'{random.choice(phraze_list) if len_img_list > 10 else "Минутку, подбираю открытки..."}')
                 media = types.MediaGroup()
                 for img in step_list:
                     if img != "":
@@ -207,6 +241,8 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
                     await bot.send_media_group(callback_user_id, media=media)
                 except RetryAfter as e:
                     await asyncio.sleep(e.timeout)
+                except Exception as ee:
+                    print(f'Что то пошло не так - {ee}')
 
         else:
             media = types.MediaGroup()
@@ -217,10 +253,13 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
                 await bot.send_media_group(callback_user_id, media=media)
             except RetryAfter as e:
                 await asyncio.sleep(e.timeout)
+            except Exception as ee:
+                print(f'Что то пошло не так - {ee}')
 
         await collback.answer()
 
     await collback.answer("К сожалению, для этого праздника открыток нет.")
+
 
 @dp.callback_query_handler(Text(startswith="collect_cat__"), state=None)
 async def show_type_category_callback_handler(collback: types.CallbackQuery):
@@ -440,10 +479,11 @@ async def colaback_hendler(collback: types.CallbackQuery):
 
 
 def register_handlers_admin(dp: Dispatcher):
-    dp.register_message_handler(prazdnik_index_handler, Text(equals="Открытки на праздники", ignore_case=True),
-                                state=None),
-    dp.register_message_handler(category_index_handler, Text(equals="Популярные категории", ignore_case=True),
-                                state=None)
+    dp.register_message_handler(mems_menu_show_handler, Text(equals="Мемы", ignore_case=True))
+    dp.register_message_handler(gifs_menu_show_handler, Text(equals="Гифки", ignore_case=True))
+    dp.register_message_handler(cards_menu_show_handler, Text(equals="Открытки", ignore_case=True))
+
+    dp.register_message_handler(category_index_handler, Text(equals="Популярные категории", ignore_case=True))
 
     dp.register_callback_query_handler(show_type_holiday_callback_handler, Text(startswith="holiday__"), state=None)
 
