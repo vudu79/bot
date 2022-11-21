@@ -24,6 +24,7 @@ async def start_handler(message: types.Message):
 
 @dp.message_handler(Text(equals="Меню", ignore_case=True))
 async def main_menu_handler(message: types.Message):
+    await message.reply(message.from_user.id, reply_markup=types.ReplyKeyboardRemove())
     await bot.send_message(message.from_user.id, reply_markup=reply_keyboard_main_menu)
 
 

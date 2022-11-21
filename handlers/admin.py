@@ -80,7 +80,7 @@ async def mems_menu_show_handler(message: types.Message):
     #                        reply_markup=InlineKeyboardMarkup(row_width=2).row(
     #                            InlineKeyboardButton(text="Сегодня", callback_data="holiday__today_"),
     #                            InlineKeyboardButton(text="Календарь", callback_data="holiday__calendar_")))
-    await message.delete_reply_markup()
+    # await message.delete_reply_markup()
     await bot.send_message(message.from_user.id,
                            "Неприлично много мемов))",
                            reply_markup=reply_keyboard_mems)
@@ -93,7 +93,7 @@ async def gifs_menu_show_handler(message: types.Message):
     #                        reply_markup=InlineKeyboardMarkup(row_width=2).row(
     #                            InlineKeyboardButton(text="Сегодня", callback_data="holiday__today_"),
     #                            InlineKeyboardButton(text="Календарь", callback_data="holiday__calendar_")))
-    await message.delete_reply_markup()
+    # await message.delete_reply_markup()
     await bot.send_message(message.from_user.id,
                            "Помогу найти гифки рызными способами))",
                            reply_markup=reply_keyboard_gifs)
@@ -106,7 +106,7 @@ async def cards_menu_show_handler(message: types.Message):
     #                        reply_markup=InlineKeyboardMarkup(row_width=2).row(
     #                            InlineKeyboardButton(text="Сегодня", callback_data="holiday__today_"),
     #                            InlineKeyboardButton(text="Календарь", callback_data="holiday__calendar_")))
-    await message.delete_reply_markup()
+    # await message.delete_reply_markup()
     await bot.send_message(message.from_user.id,
                            "Более 10000 открыток на праздники!!!",
                            reply_markup=reply_keyboard_cards)
