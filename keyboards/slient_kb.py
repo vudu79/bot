@@ -8,7 +8,7 @@ gifs_btn = KeyboardButton('Гифки')
 cards_btn = KeyboardButton('Открытки')
 mems_btn = KeyboardButton('Мемы')
 help_btn = KeyboardButton('Помощь')
-reply_keyboard_main_menu = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+reply_keyboard_main_menu = ReplyKeyboardMarkup(resize_keyboard=True)
 reply_keyboard_main_menu.row(gifs_btn).row(cards_btn, mems_btn).row(help_btn)
 
 search_btn = KeyboardButton('Найти по слову')
