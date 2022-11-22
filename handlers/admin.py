@@ -12,6 +12,7 @@ from aiogram import types, Dispatcher
 from aiogram.utils.callback_data import CallbackData
 from aiogram.utils.exceptions import RetryAfter
 
+from utils import get_pagination_keyboard
 from create_bot import dp, bot, calendar_dict, calendar_storage
 from client.http_client import *
 from database import DBase
@@ -41,36 +42,6 @@ categories_callback = CallbackData("CategorY__", "page", "category_name")
 category_list = get_categories_tenor_req()
 
 
-def get_pagination_keyboard(page: int = 0) -> InlineKeyboardMarkup:
-    keyboard = InlineKeyboardMarkup(row_width=1)
-    has_next_page = len(category_list) > page + 1
-
-    if page != 0:
-        keyboard.add(
-            InlineKeyboardButton(
-                text="👈",
-                callback_data=categories_callback.new(page=page - 1,
-                                                      category_name=f'{category_list[page - 1]["searchterm"]}')
-            )
-        )
-
-    keyboard.add(
-        InlineKeyboardButton(
-            text=f'Показать все из "{str.capitalize(category_list[page]["searchterm"])}"',
-            callback_data=f'category__{category_list[page]["searchterm"]}"'
-        )
-    )
-
-    if has_next_page:
-        keyboard.add(
-            InlineKeyboardButton(
-                text="👉",
-                callback_data=categories_callback.new(page=page + 1,
-                                                      category_name=f'{category_list[page + 1]["searchterm"]}')
-            )
-        )
-
-    return keyboard
 
 
 @dp.message_handler(Text(equals="Мемы", ignore_case=True), state=None)
@@ -277,7 +248,7 @@ async def show_type_category_callback_handler(collback: types.CallbackQuery):
     else:
         if res == "no":
             category_one = category_list[0]
-            keyboard = get_pagination_keyboard()  # Page: 0
+            keyboard = get_pagination_keyboard(category_list=category_list, categories_callback=categories_callback)  # Page: 0
 
             await bot.send_animation(
                 chat_id=callback_user_id,
@@ -290,7 +261,7 @@ async def show_type_category_callback_handler(collback: types.CallbackQuery):
 async def paginate_category_callback_handler(query: CallbackQuery, callback_data: dict):
     page = int(callback_data.get("page"))
     category_one = category_list[page]
-    keyboard = get_pagination_keyboard(page=page)
+    keyboard = get_pagination_keyboard(page=page, category_list=category_list, categories_callback=categories_callback)
 
     await bot.send_animation(
         chat_id=query.from_user.id,
