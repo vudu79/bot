@@ -112,53 +112,42 @@ async def cards_menu_show_handler(message: types.Message):
                            reply_markup=reply_keyboard_cards)
 
 
-@dp.message_handler(Text(equals="Популярные категории", ignore_case=True), state=None)
-async def category_index_handler(message: types.Message):
+@dp.message_handler(Text(equals="Календарь", ignore_case=True), state=None)
+async def carendar_holiday_message_handler(message: types.Message):
+
+    inline_keyboard_holiday = InlineKeyboardMarkup(row_width=3)
+    for month in calendar_dict.keys():
+        inline_keyboard_holiday.clean()
+        inline_keyboard_holiday.insert(
+            InlineKeyboardButton(text=f'{month}', callback_data=f'month__{month}'))
+
     await bot.send_message(message.from_user.id,
-                           "Показать все категории или по одной, но с превью?",
-                           reply_markup=InlineKeyboardMarkup(row_width=2).row(
-                               InlineKeyboardButton(text="Все сразу", callback_data="collect_cat__yes"),
-                               InlineKeyboardButton(text="По одной", callback_data="collect_cat__no")))
+                           'Выберите месяц...',
+                           reply_markup=inline_keyboard_holiday)
 
 
-@dp.callback_query_handler(Text(startswith="holiday__"), state=None)
-async def show_type_holiday_callback_handler(collback: types.CallbackQuery):
-    callback_user_id = collback.from_user.id
-    res = collback.data.split("__")[1]
-    if res == "calendar_":
-        inline_keyboard_holiday = InlineKeyboardMarkup(row_width=3)
-        for month in calendar_dict.keys():
-            inline_keyboard_holiday.clean()
-            inline_keyboard_holiday.insert(
-                InlineKeyboardButton(text=f'{month}', callback_data=f'month__{month}'))
+@dp.message_handler(Text(equals="Сегодня", ignore_case=True), state=None)
+async def today_holiday_message_handler(message: types.Message):
+    inline_keyboard_today_events = InlineKeyboardMarkup(row_width=1)
 
-        await bot.send_message(callback_user_id,
-                               'Выберите месяц...',
-                               reply_markup=inline_keyboard_holiday)
-        await collback.answer()
+    today = datetime.today().strftime("%-d.%m")
+    count = 0
+    for month in calendar_dict.keys():
+        event_list = calendar_dict[month].keys()
+        for event in event_list:
+            if event.startswith(today):
+                count = count + 1
+                inline_keyboard_today_events.clean()
+                inline_keyboard_today_events.insert(
+                    InlineKeyboardButton(text=f'{event}', callback_data=f'&ev_{month}_{str(hash(event))}'))
+
+    if count > 0:
+        await bot.send_message(message.from_user.id,
+                               'Выберите праздник.',
+                               reply_markup=inline_keyboard_today_events)
     else:
-        if res == "today_":
-            inline_keyboard_today_events = InlineKeyboardMarkup(row_width=1)
-
-            today = datetime.today().strftime("%-d.%m")
-            count = 0
-            for month in calendar_dict.keys():
-                event_list = calendar_dict[month].keys()
-                for event in event_list:
-                    if event.startswith(today):
-                        count = count + 1
-                        inline_keyboard_today_events.clean()
-                        inline_keyboard_today_events.insert(
-                            InlineKeyboardButton(text=f'{event}', callback_data=f'&ev_{month}_{str(hash(event))}'))
-
-            if count > 0:
-                await bot.send_message(callback_user_id,
-                                       'Выберите праздник.',
-                                       reply_markup=inline_keyboard_today_events)
-            else:
-                await bot.send_message(callback_user_id,
-                                       'На сегодня ничего не нашел ((')
-
+        await bot.send_message(message.from_user.id,
+                               'На сегодня ничего не нашел ((')
 
 @dp.callback_query_handler(Text(startswith="month__"), state=None)
 async def show_month_events_callback_handler(collback: types.CallbackQuery):
@@ -259,6 +248,15 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
         await collback.answer()
 
     await collback.answer("К сожалению, для этого праздника открыток нет.")
+
+
+@dp.message_handler(Text(equals="Популярные категории", ignore_case=True), state=None)
+async def category_index_handler(message: types.Message):
+    await bot.send_message(message.from_user.id,
+                           "Показать все категории или по одной, но с превью?",
+                           reply_markup=InlineKeyboardMarkup(row_width=2).row(
+                               InlineKeyboardButton(text="Все сразу", callback_data="collect_cat__yes"),
+                               InlineKeyboardButton(text="По одной", callback_data="collect_cat__no")))
 
 
 @dp.callback_query_handler(Text(startswith="collect_cat__"), state=None)
@@ -485,7 +483,8 @@ def register_handlers_admin(dp: Dispatcher):
 
     dp.register_message_handler(category_index_handler, Text(equals="Популярные категории", ignore_case=True))
 
-    dp.register_callback_query_handler(show_type_holiday_callback_handler, Text(startswith="holiday__"), state=None)
+    dp.register_callback_query_handler(carendar_holiday_message_handler, Text(equals="Календарь", ignore_case=True))
+    dp.register_callback_query_handler(today_holiday_message_handler, Text(equals="Сегодня", ignore_case=True))
 
     dp.register_callback_query_handler(show_month_events_callback_handler, Text(startswith="month__"), state=None)
 
