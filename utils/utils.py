@@ -1,15 +1,13 @@
 import json
 import random
-
+from create_bot import stickers_list
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.callback_data import CallbackData
 
 
 def get_random_stickers(count: int):
     result_list = []
-    with open("static/stickers_final.json", "r", encoding="utf-8") as file:
-        stickers_list = json.load(file)
-    for x in range(0, count):
+    while len(result_list) <= count:
         random_item = random.choice(stickers_list)
         if random_item not in result_list:
             result_list.append(random_item)

@@ -13,7 +13,7 @@ from aiogram.utils.callback_data import CallbackData
 from aiogram.utils.exceptions import RetryAfter
 
 from utils import *
-from create_bot import dp, bot, calendar_dict, calendar_storage
+from create_bot import dp, bot, calendar_dict, calendar_storage, stickers_list
 from client.http_client import *
 from database import DBase
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -106,7 +106,6 @@ async def load_count_random_stickers(message: types.Message, state: FSMContext):
         data['count'] = message.text
 
     async with state.proxy() as data:
-
         await message.answer(f'Ок, выбрано {data["count"]} шт. начинаю поиск...')
         pack_list = get_random_stickers(int(data['count']))
 
@@ -118,7 +117,7 @@ async def load_count_random_stickers(message: types.Message, state: FSMContext):
 
             media = types.MediaGroup()
 
-            if len(img_list) <= 10:
+            if len(img_list) <= 9:
                 for x in range(0, len(img_list)):
                     media.attach_photo(types.InputMediaPhoto(img_list[x]))
             else:
@@ -132,8 +131,8 @@ async def load_count_random_stickers(message: types.Message, state: FSMContext):
             except Exception as ee:
                 print(f'Что то пошло не так - {ee}')
 
-            await bot.send_message(message.from_user.id, "", reply_markup=InlineKeyboardMarkup(InlineKeyboardButton(
-                text="Добавить в телеграм", url=f'{pack["utl"]}')))
+            await bot.send_message(message.from_user.id, "1", reply_markup=InlineKeyboardMarkup(InlineKeyboardButton(
+                text="Добавить в телеграм", url=f'{pack["url"]}')))
     await state.finish()
 
 
