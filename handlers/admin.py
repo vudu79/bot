@@ -18,7 +18,7 @@ from client.http_client import *
 from database import DBase
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from keyboards import reply_keyboard_main_menu, inline_keyboard_lang, reply_keyboard_cards, reply_keyboard_gifs, \
-    reply_keyboard_mems
+    reply_keyboard_mems, reply_keyboard_stickers
 
 
 class FSMSearch(StatesGroup):
@@ -81,6 +81,21 @@ async def cards_menu_show_handler(message: types.Message):
     await bot.send_message(message.from_user.id,
                            "Более 10000 открыток на праздники!!!",
                            reply_markup=reply_keyboard_cards)
+
+
+
+@dp.message_handler(Text(equals="Стикеры", ignore_case=True), state=None)
+async def stickers_menu_show_handler(message: types.Message):
+    # await bot.send_message(message.from_user.id,
+    #                        "Более 10000 открыток на праздники!!!",
+    #                        reply_markup=InlineKeyboardMarkup(row_width=2).row(
+    #                            InlineKeyboardButton(text="Сегодня", callback_data="holiday__today_"),
+    #                            InlineKeyboardButton(text="Календарь", callback_data="holiday__calendar_")))
+    # await message.delete_reply_markup()
+    await bot.send_message(message.from_user.id,
+                           "Более 25000 стикер-паков!!! Найти бы только нужный((",
+                           reply_markup=reply_keyboard_stickers)
+
 
 
 @dp.message_handler(Text(equals="Календарь", ignore_case=True), state=None)
