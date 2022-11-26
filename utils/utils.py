@@ -7,10 +7,13 @@ from aiogram.utils.callback_data import CallbackData
 
 def get_random_stickers(count: int):
     result_list = []
-    while len(result_list) < count:
+    for x in range(0, count):
         random_item = random.choice(stickers_list)
         if random_item not in result_list:
             result_list.append(random_item)
+        else:
+            x = x - 1
+
     return result_list
 
 
