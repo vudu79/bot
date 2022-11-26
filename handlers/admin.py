@@ -106,6 +106,7 @@ async def load_count_random_stickers(message: types.Message, state: FSMContext):
 
     async with state.proxy() as data:
         await message.answer(f'Ок, работаю...')
+
         pack_list = get_random_stickers(int(data['count']))
 
         for pack in pack_list:
@@ -114,17 +115,17 @@ async def load_count_random_stickers(message: types.Message, state: FSMContext):
 
             media = types.MediaGroup()
 
-            if len(img_list) <= 9:
-                for x in range(0, len(img_list)):
-                    media.attach_photo(types.InputMediaPhoto(img_list[x]))
-            else:
-                for x in range(0, 9):
-                    media.attach_photo(types.InputMediaPhoto(img_list[x]))
-
             try:
-                await bot.send_message(message.from_user.id, f'Стикер-пак "{pack["name"]}"')
-                await bot.send_media_group(message.from_user.id, media=media,
-                                           reply_markup=InlineKeyboardMarkup(InlineKeyboardButton(
+                if len(img_list) <= 9:
+                    for x in range(0, len(img_list)):
+                        media.attach_photo(types.InputMediaPhoto(img_list[x]))
+                else:
+                    for x in range(0, 9):
+                        media.attach_photo(types.InputMediaPhoto(img_list[x]))
+
+                    await bot.send_media_group(message.from_user.id, media=media)
+                    await bot.send_message(message.from_user.id, f'"{pack["name"]}"',
+                                           reply_markup=InlineKeyboardMarkup(row_width=1).add(InlineKeyboardButton(
                                                text="Добавить в телеграм", url=f'{pack["url"]}')))
             except RetryAfter as e:
                 await asyncio.sleep(e.timeout)
