@@ -101,35 +101,39 @@ async def stickers_random_handler(message: types.Message):
 
 @dp.message_handler(state=FSMStickers.count)
 async def load_count_random_stickers(message: types.Message, state: FSMContext):
+
     async with state.proxy() as data:
-        data['count'] = int(message.text)
-    await message.answer(f'Ок, выбрано {data["count"]} шт. начинаю поиск...')
-    pack_list = get_random_stickers(data['count'])
+        data['count'] = message.text
 
-    for pack in pack_list:
+    async with state.proxy() as data:
 
-        await bot.send_message(message.from_user.id, f'Стикер-пак "{pack["name"]}"')
+        await message.answer(f'Ок, выбрано {data["count"]} шт. начинаю поиск...')
+        pack_list = get_random_stickers(int(data['count']))
 
-        img_list = pack["stickers"]
+        for pack in pack_list:
 
-        media = types.MediaGroup()
+            await bot.send_message(message.from_user.id, f'Стикер-пак "{pack["name"]}"')
 
-        if len(img_list) <= 10:
-            for x in range(0, len(img_list)):
-                media.attach_photo(types.InputMediaPhoto(img_list[x]))
-        else:
-            for x in range(0, 9):
-                media.attach_photo(types.InputMediaPhoto(img_list[x]))
+            img_list = pack["stickers"]
 
-        try:
-            await bot.send_media_group(message.from_user.id, media=media)
-        except RetryAfter as e:
-            await asyncio.sleep(e.timeout)
-        except Exception as ee:
-            print(f'Что то пошло не так - {ee}')
+            media = types.MediaGroup()
 
-        await bot.send_message(message.from_user.id, "", reply_markup=InlineKeyboardMarkup(InlineKeyboardButton(
-            text="Добавить в телеграм", url=f'{pack["utl"]}')))
+            if len(img_list) <= 10:
+                for x in range(0, len(img_list)):
+                    media.attach_photo(types.InputMediaPhoto(img_list[x]))
+            else:
+                for x in range(0, 9):
+                    media.attach_photo(types.InputMediaPhoto(img_list[x]))
+
+            try:
+                await bot.send_media_group(message.from_user.id, media=media)
+            except RetryAfter as e:
+                await asyncio.sleep(e.timeout)
+            except Exception as ee:
+                print(f'Что то пошло не так - {ee}')
+
+            await bot.send_message(message.from_user.id, "", reply_markup=InlineKeyboardMarkup(InlineKeyboardButton(
+                text="Добавить в телеграм", url=f'{pack["utl"]}')))
     await state.finish()
 
 
