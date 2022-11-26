@@ -7,7 +7,7 @@ from aiogram.utils.callback_data import CallbackData
 
 def get_random_stickers(count: int):
     result_list = []
-    with open("json/stickers_final.json", "r", encoding="utf-8") as file:
+    with open("static/stickers_final.json", "r", encoding="utf-8") as file:
         stickers_list = json.load(file)
     for x in range(0, count):
         random_item = random.choice(stickers_list)
