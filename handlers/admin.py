@@ -104,7 +104,7 @@ async def load_count_random_stickers(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['count'] = int(message.text)
     await message.answer(f'Ок, выбрано {data["count"]} шт. начинаю поиск...')
-    pack_list = get_random_stickers()
+    pack_list = get_random_stickers(data['count'])
 
     for pack in pack_list:
 
