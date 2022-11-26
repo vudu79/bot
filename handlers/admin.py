@@ -110,19 +110,17 @@ async def load_count_random_stickers(message: types.Message, state: FSMContext):
         pack_list = get_random_stickers(int(data['count']))
 
         for pack in pack_list:
-
             img_list = pack["stickers"]
-
             media = types.MediaGroup()
 
             try:
-                if len(img_list) <= 9:
+                if len(img_list) <= 10:
                     for x in range(0, len(img_list)):
                         media.attach_photo(types.InputMediaPhoto(img_list[x]))
                 else:
                     for x in range(0, 9):
                         media.attach_photo(types.InputMediaPhoto(img_list[x]))
-                    await bot.send_media_group(message.from_user.id,f'"{pack["name"]}"')
+                    await bot.send_media_group(message.from_user.id, f'"{pack["name"]}"')
                     await bot.send_media_group(message.from_user.id, media=media)
                     await bot.send_message(message.from_user.id, "Если зашло, то можно .. ",
                                            reply_markup=InlineKeyboardMarkup(row_width=1).add(InlineKeyboardButton(
