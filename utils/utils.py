@@ -1,3 +1,5 @@
+import json
+
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.callback_data import CallbackData
 
@@ -33,3 +35,5 @@ def get_pagination_keyboard(page: int = 0, category_list: any = None,
         )
 
     return keyboard
+
+
