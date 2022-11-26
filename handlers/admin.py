@@ -120,9 +120,9 @@ async def load_count_random_stickers(message: types.Message, state: FSMContext):
                 else:
                     for x in range(0, 9):
                         media.attach_photo(types.InputMediaPhoto(img_list[x]))
-                    await bot.send_media_group(message.from_user.id, f'"{pack["name"]}"')
-                    await bot.send_media_group(message.from_user.id, media=media)
-                    await bot.send_message(message.from_user.id, "Если зашло, то можно .. ",
+                await bot.send_media_group(message.from_user.id, f'"{pack["name"]}"')
+                await bot.send_media_group(message.from_user.id, media=media)
+                await bot.send_message(message.from_user.id, "Если зашло, то можно .. ",
                                            reply_markup=InlineKeyboardMarkup(row_width=1).add(InlineKeyboardButton(
                                                text=".. добавить в телеграм", url=f'{pack["url"]}')))
             except RetryAfter as e:
