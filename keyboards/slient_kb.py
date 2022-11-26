@@ -34,7 +34,7 @@ reply_keyboard_mems = ReplyKeyboardMarkup(resize_keyboard=True)
 reply_keyboard_mems.row(random_btn, trend_btn).row(main_menu_button)
 
 random_sticker_btn = KeyboardButton('Случайные паки')
-search_sticker_btn = KeyboardButton('Найти по слову')
+search_sticker_btn = KeyboardButton('Может найду...')
 reply_keyboard_stickers = ReplyKeyboardMarkup(resize_keyboard=True)
 reply_keyboard_stickers.row(random_sticker_btn, search_sticker_btn)
 

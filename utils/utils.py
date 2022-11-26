@@ -1,7 +1,19 @@
 import json
+import random
 
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.callback_data import CallbackData
+
+
+def get_random_stickers(count: int):
+    result_list = []
+    with open("json/stickers_final.json", "r", encoding="utf-8") as file:
+        stickers_list = json.load(file)
+    for x in range(0, count):
+        random_item = random.choice(stickers_list)
+        if random_item not in result_list:
+            result_list.append(random_item)
+    return result_list
 
 
 def get_pagination_keyboard(page: int = 0, category_list: any = None,
@@ -35,5 +47,3 @@ def get_pagination_keyboard(page: int = 0, category_list: any = None,
         )
 
     return keyboard
-
-

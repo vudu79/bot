@@ -12,7 +12,7 @@ from aiogram import types, Dispatcher
 from aiogram.utils.callback_data import CallbackData
 from aiogram.utils.exceptions import RetryAfter
 
-from utils import get_pagination_keyboard
+from utils import *
 from create_bot import dp, bot, calendar_dict, calendar_storage
 from client.http_client import *
 from database import DBase
@@ -26,9 +26,8 @@ class FSMSearch(StatesGroup):
     limit = State()
 
 
-class FSMCards(StatesGroup):
-    first = State()
-    second = State()
+class FSMStickers(StatesGroup):
+    count = State()
 
 
 gifs = dict()
@@ -40,8 +39,6 @@ leng_phrase = ""
 categories_callback = CallbackData("CategorY__", "page", "category_name")
 
 category_list = get_categories_tenor_req()
-
-
 
 
 @dp.message_handler(Text(equals="Мемы", ignore_case=True), state=None)
@@ -83,7 +80,6 @@ async def cards_menu_show_handler(message: types.Message):
                            reply_markup=reply_keyboard_cards)
 
 
-
 @dp.message_handler(Text(equals="Стикеры", ignore_case=True), state=None)
 async def stickers_menu_show_handler(message: types.Message):
     # await bot.send_message(message.from_user.id,
@@ -97,10 +93,66 @@ async def stickers_menu_show_handler(message: types.Message):
                            reply_markup=reply_keyboard_stickers)
 
 
+@dp.message_handler(Text(equals="Случайные паки", ignore_case=True), state=None)
+async def stickers_random_handler(message: types.Message):
+    await message.answer("Сколько паков найти?")
+    await FSMStickers.count.set()
+
+
+@dp.message_handler(state=FSMStickers.count)
+async def load_count_random_stickers(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        data['count'] = int(message.text)
+    await message.answer(f'Ок, выбрано {data["count"]} шт. начинаю поиск...')
+    pack_list = get_random_stickers()
+
+    for pack in pack_list:
+
+        await bot.send_message(message.from_user.id, f'Стикер-пак "{pack["name"]}"')
+
+        img_list = pack["stickers"]
+
+        media = types.MediaGroup()
+
+        if len(img_list) <= 10:
+            for x in range(0, len(img_list)):
+                media.attach_photo(types.InputMediaPhoto(img_list[x]))
+        else:
+            for x in range(0, 9):
+                media.attach_photo(types.InputMediaPhoto(img_list[x]))
+
+        try:
+            await bot.send_media_group(message.from_user.id, media=media)
+        except RetryAfter as e:
+            await asyncio.sleep(e.timeout)
+        except Exception as ee:
+            print(f'Что то пошло не так - {ee}')
+
+        await bot.send_message(message.from_user.id, "", reply_markup=InlineKeyboardMarkup(InlineKeyboardButton(
+            text="Добавить в телеграм", url=f'{pack["utl"]}')))
+    await state.finish()
+
+
+@dp.message_handler(Text(equals="Может найду...", ignore_case=True))
+async def stickers_search_handler(message: types.Message):
+    pass
+
 
 @dp.message_handler(Text(equals="Календарь", ignore_case=True), state=None)
 async def carendar_holiday_message_handler(message: types.Message):
+    inline_keyboard_holiday = InlineKeyboardMarkup(row_width=3)
+    for month in calendar_dict.keys():
+        inline_keyboard_holiday.clean()
+        inline_keyboard_holiday.insert(
+            InlineKeyboardButton(text=f'{month}', callback_data=f'month__{month}'))
 
+    await bot.send_message(message.from_user.id,
+                           'Выберите месяц...',
+                           reply_markup=inline_keyboard_holiday)
+
+
+@dp.message_handler(Text(equals="Календарь", ignore_case=True), state=None)
+async def carendar_holiday_message_handler(message: types.Message):
     inline_keyboard_holiday = InlineKeyboardMarkup(row_width=3)
     for month in calendar_dict.keys():
         inline_keyboard_holiday.clean()
@@ -134,6 +186,7 @@ async def today_holiday_message_handler(message: types.Message):
     else:
         await bot.send_message(message.from_user.id,
                                'На сегодня ничего не нашел ((')
+
 
 @dp.callback_query_handler(Text(startswith="month__"), state=None)
 async def show_month_events_callback_handler(collback: types.CallbackQuery):
@@ -263,7 +316,8 @@ async def show_type_category_callback_handler(collback: types.CallbackQuery):
     else:
         if res == "no":
             category_one = category_list[0]
-            keyboard = get_pagination_keyboard(category_list=category_list, categories_callback=categories_callback)  # Page: 0
+            keyboard = get_pagination_keyboard(category_list=category_list,
+                                               categories_callback=categories_callback)  # Page: 0
 
             await bot.send_animation(
                 chat_id=callback_user_id,
@@ -466,6 +520,10 @@ def register_handlers_admin(dp: Dispatcher):
     dp.register_message_handler(mems_menu_show_handler, Text(equals="Мемы", ignore_case=True))
     dp.register_message_handler(gifs_menu_show_handler, Text(equals="Гифки", ignore_case=True))
     dp.register_message_handler(cards_menu_show_handler, Text(equals="Открытки", ignore_case=True))
+    dp.register_message_handler(stickers_menu_show_handler, Text(equals="Стикеры", ignore_case=True))
+
+    dp.register_message_handler(stickers_random_handler, Text(equals="Случайные паки", ignore_case=True))
+    dp.register_message_handler(stickers_search_handler, Text(equals="Может найду...", ignore_case=True))
 
     dp.register_message_handler(category_index_handler, Text(equals="Популярные категории", ignore_case=True))
 
