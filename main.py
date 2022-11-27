@@ -19,7 +19,7 @@ import pathlib
 
 
 async def bot_start(logger: logging.Logger) -> None:
-    logging.basicConfig(level=logging.info())
+    logging.basicConfig(level=logging.INFO)
 
     # commands_for_bot = []
     # for cmd in bot_commands:
