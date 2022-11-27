@@ -109,7 +109,7 @@ async def load_count_random_stickers(message: types.Message, state: FSMContext):
 
         pack_list = get_random_stickers(int(data['count']))
 
-        print(pack_list)
+        print(len(pack_list))
 
         for pack in pack_list:
             img_list = pack["stickers"]
@@ -117,13 +117,14 @@ async def load_count_random_stickers(message: types.Message, state: FSMContext):
             media = types.MediaGroup()
 
             try:
-                if len(img_list) <= 5:
+                if len(img_list) <= 6:
                     for img in img_list:
                         media.attach_photo(types.InputMediaPhoto(img))
                 else:
-                    for x in range(0, 4):
+                    for x in range(0, 5):
                         media.attach_photo(types.InputMediaPhoto(img_list[x]))
-                if len(media.values) > 0:
+                if True:
+                    print(media.props)
                     print(f'Медиа группа - {len(media.values)} ')
                     await bot.send_message(message.from_user.id, f'"{pack["name"]}"')
                     await bot.send_message(message.from_user.id, f'{random.choice(phraze_list)}')
