@@ -140,7 +140,6 @@ async def load_count_random_stickers(message: types.Message, state: FSMContext):
             except Exception as ee:
                 await bot.send_message(message.from_user.id, "Что то пошло не так...")
                 print(f'Что то пошло не так - {ee}')
-
     await state.finish()
 
 

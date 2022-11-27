@@ -1,21 +1,33 @@
 import json
 import random
+
+from aiogram import types
+
 from create_bot import stickers_list
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.callback_data import CallbackData
 
-
 phraze_list = ["Секундочку, склеиваю фотки...", "минутку, ищу в интернетах...)", "Подождите, собираю пазл...",
-                   "Надо подождать, вспоминаю, что надо было сделать...", "Подождите,выгружаю по частям...", "Приходите попозже, устал, у меня перерыв...", "Минутку подождите, я форматирую ваши диски))"]
+               "Надо подождать, вспоминаю, что надо было сделать...", "Подождите,выгружаю по частям...",
+               "Приходите попозже, устал, у меня перерыв...", "Минутку подождите, я форматирую ваши диски))"]
+
 
 def get_random_stickers(count: int):
+    media = types.MediaGroup()
     result_list = []
-    for x in range(0, count):
+
+    while len(result_list) < count + 1:
         random_item = random.choice(stickers_list)
-        if random_item not in result_list:
-            result_list.append(random_item)
-        else:
-            x = x - 1
+        img_list = random_item["stickers"]
+        try:
+            for x in range(0, 9):
+                media.attach_photo(types.InputMediaPhoto(img_list[x]))
+            media.clean()
+            if random_item not in result_list:
+                result_list.append(random_item)
+        except Exception as e:
+            print(e)
+            continue
 
     return result_list
 
