@@ -16,13 +16,13 @@ def get_random_stickers(count: int):
     media = types.MediaGroup()
     result_list = []
 
-    while len(result_list) < count + 1:
+    while len(result_list) < count:
         random_item = random.choice(stickers_list)
         img_list = random_item["stickers"]
         try:
-            for x in range(0, 9):
-                media.attach_photo(types.InputMediaPhoto(img_list[x]))
-            media.clean()
+            for img in img_list:
+                media.attach_photo(types.InputMediaPhoto(img))
+                media.clean()
             if random_item not in result_list:
                 result_list.append(random_item)
         except Exception as e:
