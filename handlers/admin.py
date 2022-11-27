@@ -124,8 +124,8 @@ async def load_count_random_stickers(message: types.Message, state: FSMContext):
                     for x in range(0, 5):
                         media.attach_photo(types.InputMediaPhoto(img_list[x]))
                 if True:
-                    print(media.props)
-                    print(f'Медиа группа - {len(media.get_files())} ')
+                    print(media.media)
+                    print(f'Медиа группа - {len(media.media)} ')
                     await bot.send_message(message.from_user.id, f'"{pack["name"]}"')
                     await bot.send_message(message.from_user.id, f'{random.choice(phraze_list)}')
 
