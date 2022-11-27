@@ -83,7 +83,7 @@ def main():
         asyncio.run(bot_start(logger))
         # logger.info('Bot started')
     except (KeyboardInterrupt, SystemExit):
-
+        pass
 
 # logger.info('Bot stopped')
 
