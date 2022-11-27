@@ -6,11 +6,11 @@ import pathlib
 from handlers import client, admin, other
 from create_bot import TOKEN, bot, dp
 
+
 import asyncio
 import logging
 import os
 import pathlib
-
 
 #
 # if __name__ == '__main__':
@@ -19,7 +19,7 @@ import pathlib
 
 
 async def bot_start(logger: logging.Logger) -> None:
-    # logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.info())
 
     # commands_for_bot = []
     # for cmd in bot_commands:
@@ -77,15 +77,13 @@ def setup_env():
 
 def main():
     """Функция для запуска через poetry"""
-    # logger = logging.getLogger(__name__)
+    logger = logging.getLogger(__name__)
     try:
         setup_env()
         asyncio.run(bot_start(logger))
-        # logger.info('Bot started')
+        logger.info('Bot started')
     except (KeyboardInterrupt, SystemExit):
-        pass
-
-# logger.info('Bot stopped')
+        logger.info('Bot stopped')
 
 
 if __name__ == '__main__':
