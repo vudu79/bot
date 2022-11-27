@@ -12,7 +12,7 @@ storage = MemoryStorage()
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot, storage=storage)
 
-with open("static/stickers_final.json", "r", encoding="utf-8") as file:
+with open("static/stickers_tlgrm.json", "r", encoding="utf-8") as file:
     stickers_list = json.load(file)
 
 with open('calendar.json', 'r', encoding='utf-8') as f:
