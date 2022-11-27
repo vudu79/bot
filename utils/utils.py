@@ -5,6 +5,9 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.callback_data import CallbackData
 
 
+phraze_list = ["Секундочку, склеиваю фотки...", "минутку, ищу в интернетах...)", "Подождите, собираю пазл...",
+                   "Надо подождать, вспоминаю, что надо было сделать...", "Подождите,выгружаю по частям...", "Приходите попозже, устал, у меня перерыв...", "Минутку подождите, я форматирую ваши диски))"]
+
 def get_random_stickers(count: int):
     result_list = []
     for x in range(0, count):

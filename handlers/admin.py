@@ -117,18 +117,21 @@ async def load_count_random_stickers(message: types.Message, state: FSMContext):
             media = types.MediaGroup()
 
             try:
-                if len(img_list) <= 10:
+                if len(img_list) <= 5:
                     for img in img_list:
                         media.attach_photo(types.InputMediaPhoto(img))
                 else:
-                    for x in range(0, 9):
+                    for x in range(0, 4):
                         media.attach_photo(types.InputMediaPhoto(img_list[x]))
                 if len(media.values) > 0:
+                    print(f'Медиа группа - {len(media.values)} ')
                     await bot.send_message(message.from_user.id, f'"{pack["name"]}"')
+                    await bot.send_message(message.from_user.id, f'{random.choice(phraze_list)}')
+
                     await bot.send_media_group(message.from_user.id, media=media)
-                    await bot.send_message(message.from_user.id, "Если зашло, то можно .. ",
+                    await bot.send_message(message.from_user.id, "...",
                                            reply_markup=InlineKeyboardMarkup(row_width=1).add(InlineKeyboardButton(
-                                               text=".. добавить в телеграм", url=f'{pack["url"]}')))
+                                               text="Добавить в телеграм", url=f'{pack["url"]}')))
             except RetryAfter as e:
                 await asyncio.sleep(e.timeout)
             except Exception as ee:
@@ -222,8 +225,8 @@ def func_chunk(lst, n):
 
 @dp.callback_query_handler(Text(startswith="&ev_"), state=None)
 async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
-    phraze_list = ["Склеиваю открытки...", "Ищу в интернетах...)", "Собираю пазл...",
-                   "Вспоминаю, что надо было сделать...", "Выгружаю по частям...", "Устал, у меня перерыв..."]
+    # phraze_list = ["Склеиваю открытки...", "Ищу в интернетах...)", "Собираю пазл...",
+    #                "Вспоминаю, что надо было сделать...", "Выгружаю по частям...", "Устал, у меня перерыв..."]
     callback_user_id = collback.from_user.id
     month = collback.data.split("_")[1]
     event_hash = collback.data.split("_")[2]
