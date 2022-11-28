@@ -26,8 +26,9 @@ async def unknown_message(msg: types.Message):
 
 @dp.message_handler(content_types=ContentType.TEXT)
 async def any_handler(message: types.Message):
-    await bot.send_message(message.from_user.id, "Это бот для ленивых, тут все на кнопках))")
+    user_id = message.from_user.id
     await message.delete()
+    await bot.send_message(user_id, "Это бот для ленивых, тут все на кнопках))")
 
 
 def register_handlers_other(dp: Dispatcher):

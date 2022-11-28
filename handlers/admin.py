@@ -14,7 +14,7 @@ from aiogram.utils.callback_data import CallbackData
 from aiogram.utils.exceptions import RetryAfter
 
 from utils import *
-from create_bot import dp, bot, calendar_dict, calendar_storage, stickers_list
+from create_bot import dp, bot, calendar_dict, calendar_storage, stickers_list, stickers_dict
 from client.http_client import *
 from database import DBase
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -27,7 +27,12 @@ class FSMSearch(StatesGroup):
     limit = State()
 
 
-class FSMStickers(StatesGroup):
+class FSMStickersRandom(StatesGroup):
+    count = State()
+
+
+class FSMStickersSearch(StatesGroup):
+    word = State()
     count = State()
 
 
@@ -42,7 +47,7 @@ categories_callback = CallbackData("CategorY__", "page", "category_name")
 category_list = get_categories_tenor_req()
 
 
-@dp.message_handler(Text(equals="Мемы", ignore_case=True), state=None)
+@dp.message_handler(Text(equals="Мемы", ignore_case=False), state=None)
 async def mems_menu_show_handler(message: types.Message):
     # await bot.send_message(message.from_user.id,
     #                        "Более 10000 открыток на праздники!!!",
@@ -55,7 +60,7 @@ async def mems_menu_show_handler(message: types.Message):
                            reply_markup=reply_keyboard_mems)
 
 
-@dp.message_handler(Text(equals="Гифки", ignore_case=True), state=None)
+@dp.message_handler(Text(equals="Гифки", ignore_case=False), state=None)
 async def gifs_menu_show_handler(message: types.Message):
     # await bot.send_message(message.from_user.id,
     #                        "Более 10000 открыток на праздники!!!",
@@ -68,7 +73,7 @@ async def gifs_menu_show_handler(message: types.Message):
                            reply_markup=reply_keyboard_gifs)
 
 
-@dp.message_handler(Text(equals="Открытки", ignore_case=True), state=None)
+@dp.message_handler(Text(equals="Открытки", ignore_case=False), state=None)
 async def cards_menu_show_handler(message: types.Message):
     # await bot.send_message(message.from_user.id,
     #                        "Более 10000 открыток на праздники!!!",
@@ -81,7 +86,7 @@ async def cards_menu_show_handler(message: types.Message):
                            reply_markup=reply_keyboard_cards)
 
 
-@dp.message_handler(Text(equals="Стикеры", ignore_case=True), state=None)
+@dp.message_handler(Text(equals="Стикеры", ignore_case=False), state=None)
 async def stickers_menu_show_handler(message: types.Message):
     # await bot.send_message(message.from_user.id,
     #                        "Более 10000 открыток на праздники!!!",
@@ -94,13 +99,33 @@ async def stickers_menu_show_handler(message: types.Message):
                            reply_markup=reply_keyboard_stickers)
 
 
-@dp.message_handler(Text(equals="Случайные паки", ignore_case=True), state=None)
+@dp.message_handler(Text(equals="Случайные паки", ignore_case=False), state=None)
 async def stickers_random_handler(message: types.Message):
     await message.answer("Сколько паков найти?")
-    await FSMStickers.count.set()
+    await FSMStickersRandom.count.set()
+
+@dp.message_handler(Text(equals="Может найду...", ignore_case=False), state=None)
+async def stickers_search_handler(message: types.Message):
+    await message.answer("Введите ключевое слово для поиска...")
+    await FSMStickersSearch.word.set()
 
 
-@dp.message_handler(state=FSMStickers.count)
+@dp.message_handler(state=FSMStickersSearch.word)
+async def load_word_search_stickers(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        data['word'] = message.text
+        stickers_names = stickers_dict.keys()
+        matches_list = []
+        for name in stickers_names:
+            if data['word'] in name:
+                matches_list.append(name)
+        await bot.send_message(message.from_user.id, f'{matches_list}')
+
+    await state.finish()
+
+
+
+@dp.message_handler(state=FSMStickersRandom.count)
 async def load_count_random_stickers(message: types.Message, state: FSMContext):
     num_string = message.text
     if not (num_string.isnumeric() and num_string.isdigit() and re.match("[-+]?\d+$", num_string)):
@@ -146,12 +171,12 @@ async def load_count_random_stickers(message: types.Message, state: FSMContext):
         await state.finish()
 
 
-@dp.message_handler(Text(equals="Может найду...", ignore_case=True))
+@dp.message_handler(Text(equals="Может найду...", ignore_case=False))
 async def stickers_search_handler(message: types.Message):
     pass
 
 
-@dp.message_handler(Text(equals="Календарь", ignore_case=True), state=None)
+@dp.message_handler(Text(equals="Календарь", ignore_case=False), state=None)
 async def carendar_holiday_message_handler(message: types.Message):
     inline_keyboard_holiday = InlineKeyboardMarkup(row_width=3)
     for month in calendar_dict.keys():
@@ -164,7 +189,7 @@ async def carendar_holiday_message_handler(message: types.Message):
                            reply_markup=inline_keyboard_holiday)
 
 
-@dp.message_handler(Text(equals="Календарь", ignore_case=True), state=None)
+@dp.message_handler(Text(equals="Календарь", ignore_case=False), state=None)
 async def carendar_holiday_message_handler(message: types.Message):
     inline_keyboard_holiday = InlineKeyboardMarkup(row_width=3)
     for month in calendar_dict.keys():
@@ -177,7 +202,7 @@ async def carendar_holiday_message_handler(message: types.Message):
                            reply_markup=inline_keyboard_holiday)
 
 
-@dp.message_handler(Text(equals="Сегодня", ignore_case=True), state=None)
+@dp.message_handler(Text(equals="Сегодня", ignore_case=False), state=None)
 async def today_holiday_message_handler(message: types.Message):
     inline_keyboard_today_events = InlineKeyboardMarkup(row_width=1)
 
@@ -302,7 +327,7 @@ async def show_event_images_colaback_hendler(collback: types.CallbackQuery):
     await collback.answer("К сожалению, для этого праздника открыток нет.")
 
 
-@dp.message_handler(Text(equals="Популярные категории", ignore_case=True), state=None)
+@dp.message_handler(Text(equals="Популярные категории", ignore_case=False), state=None)
 async def category_index_handler(message: types.Message):
     await bot.send_message(message.from_user.id,
                            "Показать все категории или по одной, но с превью?",
@@ -370,7 +395,7 @@ async def show_list_category_colaback_hendler(collback: types.CallbackQuery):
 # Машина состояний для searchAPI________________________________________________________________________________________
 # Запускаем машину состояния FSMAdmin хэндлером
 
-@dp.message_handler(Text(equals="Найти по слову", ignore_case=True))
+@dp.message_handler(Text(equals="Найти по слову", ignore_case=False))
 async def choose_lang_handler(message: types.Message):
     await message.answer("Выберите язык на котором будете писать запрос", reply_markup=inline_keyboard_lang)
 
@@ -396,7 +421,7 @@ async def colaback_hendler_lang_start_search(collback: types.CallbackQuery):
 
 # Выход из состояния
 @dp.message_handler(state="*", commands='отмена')
-@dp.message_handler(Text(equals=['отмена', 'Отменить поиск'], ignore_case=True), state="*")
+@dp.message_handler(Text(equals=['отмена', 'Отменить поиск'], ignore_case=False), state="*")
 async def cansel_state_search(maseege: types.Message, state: FSMContext):
     current_state = await state.get_state()
     if current_state is None:
@@ -438,14 +463,14 @@ class FSMRandom(StatesGroup):
     subj = State()
 
 
-@dp.message_handler(Text(equals="Случайная по слову", ignore_case=True), state=None)
+@dp.message_handler(Text(equals="Случайная по слову", ignore_case=False), state=None)
 async def cm_start_random(message: types.Message):
     await FSMRandom.subj.set()
     await message.answer("Напишите ключевое слово для поиска на английском языке")
 
 
 @dp.message_handler(state="*", commands='отмена')
-@dp.message_handler(Text(equals=['отмена', 'Отменить поиск'], ignore_case=True), state="*")
+@dp.message_handler(Text(equals=['отмена', 'Отменить поиск'], ignore_case=False), state="*")
 async def cansel_state_random(maseege: types.Message, state: FSMContext):
     current_state = await state.get_state()
     if current_state is None:
@@ -475,14 +500,14 @@ class FSMTranslate(StatesGroup):
     phrase = State()
 
 
-@dp.message_handler(Text(equals="Гифка под фразу", ignore_case=True), state=None)
+@dp.message_handler(Text(equals="Гифка под фразу", ignore_case=False), state=None)
 async def cm_start_translate(message: types.Message):
     await FSMTranslate.phrase.set()
     await message.answer("Напишите любую фразу на английском языке")
 
 
 @dp.message_handler(state="*", commands='отмена')
-@dp.message_handler(Text(equals=['отмена', 'Отменить поиск'], ignore_case=True), state="*")
+@dp.message_handler(Text(equals=['отмена', 'Отменить поиск'], ignore_case=False), state="*")
 async def cansel_state_translate(maseege: types.Message, state: FSMContext):
     current_state = await state.get_state()
     if current_state is None:
@@ -530,18 +555,18 @@ async def colaback_hendler(collback: types.CallbackQuery):
 
 
 def register_handlers_admin(dp: Dispatcher):
-    dp.register_message_handler(mems_menu_show_handler, Text(equals="Мемы", ignore_case=True))
-    dp.register_message_handler(gifs_menu_show_handler, Text(equals="Гифки", ignore_case=True))
-    dp.register_message_handler(cards_menu_show_handler, Text(equals="Открытки", ignore_case=True))
-    dp.register_message_handler(stickers_menu_show_handler, Text(equals="Стикеры", ignore_case=True))
+    dp.register_message_handler(mems_menu_show_handler, Text(equals="Мемы", ignore_case=False))
+    dp.register_message_handler(gifs_menu_show_handler, Text(equals="Гифки", ignore_case=False))
+    dp.register_message_handler(cards_menu_show_handler, Text(equals="Открытки", ignore_case=False))
+    dp.register_message_handler(stickers_menu_show_handler, Text(equals="Стикеры", ignore_case=False))
 
-    dp.register_message_handler(stickers_random_handler, Text(equals="Случайные паки", ignore_case=True))
-    dp.register_message_handler(stickers_search_handler, Text(equals="Может найду...", ignore_case=True))
+    dp.register_message_handler(stickers_random_handler, Text(equals="Случайные паки", ignore_case=False))
+    dp.register_message_handler(stickers_search_handler, Text(equals="Может найду...", ignore_case=False))
 
-    dp.register_message_handler(category_index_handler, Text(equals="Популярные категории", ignore_case=True))
+    dp.register_message_handler(category_index_handler, Text(equals="Популярные категории", ignore_case=False))
 
-    dp.register_callback_query_handler(carendar_holiday_message_handler, Text(equals="Календарь", ignore_case=True))
-    dp.register_callback_query_handler(today_holiday_message_handler, Text(equals="Сегодня", ignore_case=True))
+    dp.register_callback_query_handler(carendar_holiday_message_handler, Text(equals="Календарь", ignore_case=False))
+    dp.register_callback_query_handler(today_holiday_message_handler, Text(equals="Сегодня", ignore_case=False))
 
     dp.register_callback_query_handler(show_month_events_callback_handler, Text(startswith="month__"), state=None)
 
@@ -553,17 +578,17 @@ def register_handlers_admin(dp: Dispatcher):
     dp.register_callback_query_handler(paginate_category_callback_handler, categories_callback.filter())
     dp.register_callback_query_handler(show_list_category_colaback_hendler, Text(startswith="category__"), state=None)
 
-    dp.register_message_handler(choose_lang_handler, Text(equals="Найти по слову", ignore_case=True))
+    dp.register_message_handler(choose_lang_handler, Text(equals="Найти по слову", ignore_case=False))
     dp.register_callback_query_handler(colaback_hendler_lang_start_search, Text(startswith="leng__"), state=None)
     dp.register_message_handler(cansel_state_search, state="*", commands='отмена')
     dp.register_message_handler(load_subj_sm_search, state=FSMSearch.subj)
     dp.register_message_handler(load_limit_sm_search, state=FSMSearch.limit)
 
-    dp.register_message_handler(cm_start_random, Text(equals="Случайная по слову", ignore_case=True), state=None)
+    dp.register_message_handler(cm_start_random, Text(equals="Случайная по слову", ignore_case=False), state=None)
     dp.register_message_handler(cansel_state_random, state="*", commands='отмена')
     dp.register_message_handler(load_subj_sm_random, state=FSMRandom.subj)
 
-    dp.register_message_handler(cm_start_translate, Text(equals="Гифка под фразу", ignore_case=True), state=None)
+    dp.register_message_handler(cm_start_translate, Text(equals="Гифка под фразу", ignore_case=False), state=None)
     dp.register_message_handler(cansel_state_translate, state="*", commands='отмена')
     dp.register_message_handler(load_subj_sm_translate, state=FSMTranslate.phrase)
 
