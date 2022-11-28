@@ -130,7 +130,7 @@ async def load_count_random_stickers(message: types.Message, state: FSMContext):
                                            parse_mode="HTML")
 
                     await bot.send_media_group(message.from_user.id, media=media)
-                    await bot.send_message(message.from_user.id, f'"Стикеры <b>"{pack["name"]}"</b>',
+                    await bot.send_message(message.from_user.id, f'Стикеры <b>"{pack["name"]}"</b>',
                                            parse_mode="HTML",
                                            reply_markup=InlineKeyboardMarkup(row_width=1).add(InlineKeyboardButton(
                                                text="Добавить в телеграм", url=f'{pack["url"]}')))
@@ -165,14 +165,14 @@ async def load_count_random_stickers(message: types.Message, state: FSMContext):
                                                parse_mode="HTML")
 
                         await bot.send_media_group(message.from_user.id, media=media)
-                        await bot.send_message(message.from_user.id, f'"Стикеры <b>"{pack["name"]}"</b>',
+                        await bot.send_message(message.from_user.id, f'Стикеры <b>"{pack["name"]}"</b>',
                                                parse_mode="HTML",
                                                reply_markup=InlineKeyboardMarkup(row_width=1).add(InlineKeyboardButton(
                                                    text="Добавить в телеграм", url=f'{pack["url"]}')))
 
                 except Exception as ee:
                     await bot.send_message(message.from_user.id, "Что то пошло не так...")
-                    print(f'Что то пошло не так - {ee}')
+                    print(f'Извените попался сломанный ситекер-пак(( - {ee}')
 
     await state.finish()
 
