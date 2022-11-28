@@ -101,49 +101,50 @@ async def stickers_random_handler(message: types.Message):
 
 @dp.message_handler(state=FSMStickers.count)
 async def load_count_random_stickers(message: types.Message, state: FSMContext):
-    async with state.proxy() as data:
-        data['count'] = message.text
-
+    while True:
         try:
-            packs_count = int(data['count'])
-            count = 0
-            await message.answer(f'Ок, работаю...')
-            while count < packs_count:
-                random_sticker_dict = random.choice(stickers_list)
-                img_list = random_sticker_dict["stickers"]
-                media = types.MediaGroup()
-
-                if len(img_list) <= 6:
-                    for img in img_list:
-                        media.attach_photo(types.InputMediaPhoto(img))
-                else:
-                    for x in range(0, 5):
-                        media.attach_photo(types.InputMediaPhoto(img_list[x]))
-
-                try:
-                    if len(media.media) > 0:
-                        print(f'Медиа группа - {len(media.media)} ')
-
-                        await bot.send_message(message.from_user.id, f'<em>{random.choice(phraze_list)}</em>',
-                                               parse_mode="HTML")
-
-                        await bot.send_media_group(message.from_user.id, media=media)
-                        await bot.send_message(message.from_user.id, f'Стикеры <b>"{random_sticker_dict["name"]}"</b>',
-                                               parse_mode="HTML",
-                                               reply_markup=InlineKeyboardMarkup(row_width=1).add(InlineKeyboardButton(
-                                                   text="Добавить в телеграм", url=f'{random_sticker_dict["url"]}')))
-                        count = count + 1
-                except Exception as ee:
-                    print(f"Что то пошло не так {ee}")
-                    with open("static/bad_pack.txt", 'a') as file:
-                        file.write(random_sticker_dict["name"])
-            # await bot.send_message(message.from_user.id, "Что то пошло не так...")
-
+            packs_count = int(message.text)
+            break
         except ValueError:
             await bot.send_message(message.from_user.id, "Введите целое число")
-            await FSMStickers.previous()
-    await state.finish()
 
+    async with state.proxy() as data:
+        data['count'] = packs_count
+
+        count = 0
+        await message.answer(f'Ок, работаю...')
+        while count < packs_count:
+            random_sticker_dict = random.choice(stickers_list)
+            img_list = random_sticker_dict["stickers"]
+            media = types.MediaGroup()
+
+            if len(img_list) <= 6:
+                for img in img_list:
+                    media.attach_photo(types.InputMediaPhoto(img))
+            else:
+                for x in range(0, 5):
+                    media.attach_photo(types.InputMediaPhoto(img_list[x]))
+
+            try:
+                if len(media.media) > 0:
+                    print(f'Медиа группа - {len(media.media)} ')
+
+                    await bot.send_message(message.from_user.id, f'<em>{random.choice(phraze_list)}</em>',
+                                           parse_mode="HTML")
+
+                    await bot.send_media_group(message.from_user.id, media=media)
+                    await bot.send_message(message.from_user.id, f'Стикеры <b>"{random_sticker_dict["name"]}"</b>',
+                                           parse_mode="HTML",
+                                           reply_markup=InlineKeyboardMarkup(row_width=1).add(InlineKeyboardButton(
+                                               text="Добавить в телеграм", url=f'{random_sticker_dict["url"]}')))
+                    count = count + 1
+            except Exception as ee:
+                print(f"Что то пошло не так {ee}")
+                with open("static/bad_pack.txt", 'a') as file:
+                    file.write(random_sticker_dict["name"])
+        # await bot.send_message(message.from_user.id, "Что то пошло не так...")
+
+    await state.finish()
 
 
 @dp.message_handler(Text(equals="Может найду...", ignore_case=True))
