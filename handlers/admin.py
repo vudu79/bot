@@ -126,17 +126,27 @@ async def load_count_random_stickers(message: types.Message, state: FSMContext):
                 if len(media.media) > 0:
                     # print(f'Медиа группа - {len(media.media)} ')
 
-                    # await bot.send_message(message.from_user.id, f'<em>{random.choice(phraze_list)}</em>',
-                    #                        parse_mode="HTML")
+                    await bot.send_message(message.from_user.id, f'<em>{random.choice(phraze_list)}</em>',
+                                           parse_mode="HTML")
 
                     await bot.send_media_group(message.from_user.id, media=media)
-                    # await bot.send_message(message.from_user.id, f'"Стикер-пак <b>"{pack["name"]}"</b>',
-                    #                        parse_mode="HTML",
-                    #                        reply_markup=InlineKeyboardMarkup(row_width=1).add(InlineKeyboardButton(
-                    #                            text="Добавить в телеграм", url=f'{pack["url"]}')))
+                    await bot.send_message(message.from_user.id, f'"Стикеры <b>"{pack["name"]}"</b>',
+                                           parse_mode="HTML",
+                                           reply_markup=InlineKeyboardMarkup(row_width=1).add(InlineKeyboardButton(
+                                               text="Добавить в телеграм", url=f'{pack["url"]}')))
 
             except Exception as ee:
-                await bot.send_message(message.from_user.id, "Что то пошло не так...")
+                # await bot.send_message(message.from_user.id, "Что то пошло не так...")
+                media.clean()
+                for img in img_list:
+                    res = requests.get(img)
+                    if res.status_code == 200:
+
+                        media.attach_photo(types.InputMediaPhoto(img))
+            else:
+                for x in range(0, 5):
+                    media.attach_photo(types.InputMediaPhoto(img_list[x]))
+
                 print(f'Что то пошло не так - {ee}')
     await state.finish()
 
