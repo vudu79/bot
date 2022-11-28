@@ -141,7 +141,7 @@ async def load_count_random_stickers(message: types.Message, state: FSMContext):
 
         except ValueError:
             await bot.send_message(message.from_user.id, "Введите целое число")
-            await FSMStickers.count.set()
+            await FSMStickers.previous()
     await state.finish()
 
 
