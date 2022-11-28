@@ -104,77 +104,111 @@ async def load_count_random_stickers(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['count'] = message.text
 
-    async with state.proxy() as data:
-        await message.answer(f'Ок, работаю...')
+        try:
+            packs_count = int(data['count'])
+            count = 0
+            await message.answer(f'Ок, работаю...')
+            while count < packs_count:
+                random_sticker_dict = random.choice(stickers_list)
+                img_list = random_sticker_dict["stickers"]
+                media = types.MediaGroup()
 
-        pack_list = get_random_stickers(int(data['count']))
-
-        print(len(pack_list))
-
-        for pack in pack_list:
-            img_list = pack["stickers"]
-
-            media = types.MediaGroup()
-            if len(img_list) <= 6:
-                for img in img_list:
-                    media.attach_photo(types.InputMediaPhoto(img))
-            else:
-                for x in range(0, 5):
-                    media.attach_photo(types.InputMediaPhoto(img_list[x]))
-
-            try:
-                if len(media.media) > 0:
-                    # print(f'Медиа группа - {len(media.media)} ')
-
-                    await bot.send_message(message.from_user.id, f'<em>{random.choice(phraze_list)}</em>',
-                                           parse_mode="HTML")
-
-                    await bot.send_media_group(message.from_user.id, media=media)
-                    await bot.send_message(message.from_user.id, f'Стикеры <b>"{pack["name"]}"</b>',
-                                           parse_mode="HTML",
-                                           reply_markup=InlineKeyboardMarkup(row_width=1).add(InlineKeyboardButton(
-                                               text="Добавить в телеграм", url=f'{pack["url"]}')))
-
-            except Exception as ee:
-                # await bot.send_message(message.from_user.id, "Что то пошло не так...")
-
-                media.clean()
                 if len(img_list) <= 6:
                     for img in img_list:
-                        for img in img_list:
-                            res = requests.get(img)
-                            if res.status_code == 200:
-                                with open("temp_img.jpg", 'wb') as f:
-                                    shutil.copyfileobj(res.raw, f)
-                                media.attach_photo(types.InputFile("temp_img.jpg"), '_')
-                                os.remove("temp_img.jpg")
-
+                        media.attach_photo(types.InputMediaPhoto(img))
                 else:
                     for x in range(0, 5):
-                        res = requests.get(img_list[x])
-                        if res.status_code == 200:
-                            with open("temp_img.jpg", 'wb') as f:
-                                shutil.copyfileobj(res.raw, f)
-                            media.attach_photo(types.InputFile("temp_img.jpg"), '_')
-                            os.remove("temp_img.jpg")
+                        media.attach_photo(types.InputMediaPhoto(img_list[x]))
+
                 try:
                     if len(media.media) > 0:
-                        # print(f'Медиа группа - {len(media.media)} ')
+                        print(f'Медиа группа - {len(media.media)} ')
 
                         await bot.send_message(message.from_user.id, f'<em>{random.choice(phraze_list)}</em>',
                                                parse_mode="HTML")
 
                         await bot.send_media_group(message.from_user.id, media=media)
-                        await bot.send_message(message.from_user.id, f'Стикеры <b>"{pack["name"]}"</b>',
+                        await bot.send_message(message.from_user.id, f'Стикеры <b>"{random_sticker_dict["name"]}"</b>',
                                                parse_mode="HTML",
                                                reply_markup=InlineKeyboardMarkup(row_width=1).add(InlineKeyboardButton(
-                                                   text="Добавить в телеграм", url=f'{pack["url"]}')))
-
+                                                   text="Добавить в телеграм", url=f'{random_sticker_dict["url"]}')))
+                        count = count + 1
                 except Exception as ee:
-                    await bot.send_message(message.from_user.id, "Что то пошло не так...")
-                    print(f'Извените попался сломанный ситекер-пак(( - {ee}')
+                    print(f"Что то пошло не так {ee}")
+            # await bot.send_message(message.from_user.id, "Что то пошло не так...")
+
+        except ValueError:
+            bot.send_message(message.from_user.id, "Введите целое число")
 
     await state.finish()
+
+
+    # pack_list = get_random_stickers(int(data['count']))
+
+    # for pack in pack_list:
+    #     img_list = pack["stickers"]
+    #
+    #     media = types.MediaGroup()
+    #     if len(img_list) <= 6:
+    #         for img in img_list:
+    #             media.attach_photo(types.InputMediaPhoto(img))
+    #     else:
+    #         for x in range(0, 5):
+    #             media.attach_photo(types.InputMediaPhoto(img_list[x]))
+    #
+    #     try:
+    #         if len(media.media) > 0:
+    #             # print(f'Медиа группа - {len(media.media)} ')
+    #
+    #             await bot.send_message(message.from_user.id, f'<em>{random.choice(phraze_list)}</em>',
+    #                                    parse_mode="HTML")
+    #
+    #             await bot.send_media_group(message.from_user.id, media=media)
+    #             await bot.send_message(message.from_user.id, f'Стикеры <b>"{pack["name"]}"</b>',
+    #                                    parse_mode="HTML",
+    #                                    reply_markup=InlineKeyboardMarkup(row_width=1).add(InlineKeyboardButton(
+    #                                        text="Добавить в телеграм", url=f'{pack["url"]}')))
+    #
+    #     except Exception as ee:
+    #         # await bot.send_message(message.from_user.id, "Что то пошло не так...")
+    #
+    #         media.clean()
+    #         if len(img_list) <= 6:
+    #             for img in img_list:
+    #                 for img in img_list:
+    #                     res = requests.get(img)
+    #                     if res.status_code == 200:
+    #                         with open("temp_img.jpg", 'wb') as f:
+    #                             shutil.copyfileobj(res.raw, f)
+    #                         media.attach_photo(types.InputFile("temp_img.jpg"), '_')
+    #                         os.remove("temp_img.jpg")
+    #
+    #         else:
+    #             for x in range(0, 5):
+    #                 res = requests.get(img_list[x])
+    #                 if res.status_code == 200:
+    #                     with open("temp_img.jpg", 'wb') as f:
+    #                         shutil.copyfileobj(res.raw, f)
+    #                     media.attach_photo(types.InputFile("temp_img.jpg"), '_')
+    #                     os.remove("temp_img.jpg")
+    #         try:
+    #             if len(media.media) > 0:
+    #                 # print(f'Медиа группа - {len(media.media)} ')
+    #
+    #                 await bot.send_message(message.from_user.id, f'<em>{random.choice(phraze_list)}</em>',
+    #                                        parse_mode="HTML")
+    #
+    #                 await bot.send_media_group(message.from_user.id, media=media)
+    #                 await bot.send_message(message.from_user.id, f'Стикеры <b>"{pack["name"]}"</b>',
+    #                                        parse_mode="HTML",
+    #                                        reply_markup=InlineKeyboardMarkup(row_width=1).add(InlineKeyboardButton(
+    #                                            text="Добавить в телеграм", url=f'{pack["url"]}')))
+    #
+    #         except Exception as ee:
+    #             await bot.send_message(message.from_user.id, "Извените попался сломанный ситекер-пак((")
+    #             print(f'Ошибка с файлами стикеров(( - {ee}')
+
+    # await state.finish()
 
 
 @dp.message_handler(Text(equals="Может найду...", ignore_case=True))
