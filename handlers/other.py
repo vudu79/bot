@@ -13,7 +13,7 @@ async def mat_filter_handler(message: types.Message):
             .intersection(set(json.load(open('json_mat.json')))) != set():
         await message.reply("Маты запрещены в чате")
         await message.delete()
-    await message.reply(message.text)
+    # await message.reply(message.text)
 
 
 @dp.message_handler(content_types=ContentType.ANY)

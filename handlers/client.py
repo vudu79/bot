@@ -17,15 +17,16 @@ async def exception_handler(update: types.Update, exception: exceptions.RetryAft
 @dp.message_handler(commands=['start', 'help'])
 async def start_handler(message: types.Message):
     await bot.send_message(message.from_user.id, f'Привет, {message.from_user.first_name}!')
-    await bot.send_message(message.from_user.id, 'Это бот для поиска гифок в интернете разными способами))',
+    await bot.send_message(message.from_user.id, 'Это бот для поиска полезного и не очень медиа в интернете.',
                            reply_markup=reply_keyboard_main_menu)
-    await bot.send_message(message.from_user.id, "Как будем искать? тыц 👇")
+    await bot.send_message(message.from_user.id, "Что будем искать?")
+    await bot.send_message(message.from_user.id, "Тыц 👇")
 
 
 @dp.message_handler(Text(equals="Меню", ignore_case=True))
 async def main_menu_handler(message: types.Message):
     # await bot.send_message(message.from_user.id, "", reply_markup=types.ReplyKeyboardRemove())
-    await bot.send_message(message.from_user.id, "1", reply_markup=reply_keyboard_main_menu)
+    await bot.send_message(message.from_user.id, "...", reply_markup=reply_keyboard_main_menu)
 
 
 def register_handlers_client(dp: Dispatcher):
