@@ -28,15 +28,10 @@ async def main_menu_handler(message: types.Message):
     # await bot.send_message(message.from_user.id, "", reply_markup=types.ReplyKeyboardRemove())
     await bot.send_message(message.from_user.id, "...", reply_markup=reply_keyboard_main_menu)
 
-@dp.message_handler()
-async def any_handler(message: types.Message):
-    # await bot.send_message(message.from_user.id, "", reply_markup=types.ReplyKeyboardRemove())
-    await bot.send_message(message.from_user.id, "Это бот для ленивых, тут все на кнопках))")
-    await message.delete()
 
 
 def register_handlers_client(dp: Dispatcher):
     dp.register_message_handler(start_handler, commands=['start', 'help'])
     dp.register_message_handler(main_menu_handler, Text(equals="Меню", ignore_case=True))
     dp.register_errors_handler(exception_handler, exception=exceptions.RetryAfter)
-    dp.register_errors_handler(any_handler)
+
