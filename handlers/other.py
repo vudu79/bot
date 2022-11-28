@@ -33,4 +33,4 @@ async def any_handler(message: types.Message):
 def register_handlers_other(dp: Dispatcher):
     dp.register_message_handler(mat_filter_handler)
     dp.register_message_handler(unknown_message, content_types=ContentType.ANY)
-    dp.register_errors_handler(any_handler)
+    dp.register_message_handler(any_handler)
