@@ -23,14 +23,14 @@ async def unknown_message(msg: types.Message):
                         code('команда'), '/help', 'и кнопки внизу))')
     await msg.reply(message_text, parse_mode=ParseMode.MARKDOWN)
 
-@dp.message_handler()
+
+@dp.message_handler(content_types=ContentType.TEXT)
 async def any_handler(message: types.Message):
     await bot.send_message(message.from_user.id, "Это бот для ленивых, тут все на кнопках))")
     await message.delete()
 
 
-
 def register_handlers_other(dp: Dispatcher):
     dp.register_message_handler(mat_filter_handler)
     dp.register_message_handler(unknown_message, content_types=ContentType.ANY)
-    dp.register_message_handler(any_handler)
+    dp.register_message_handler(any_handler, content_types=ContentType.TEXT)
