@@ -135,6 +135,8 @@ async def load_count_random_stickers(message: types.Message, state: FSMContext):
                         count = count + 1
                 except Exception as ee:
                     print(f"Что то пошло не так {ee}")
+                    with open("static/bad_pack.txt", 'a') as file:
+                        file.write(random_sticker_dict["name"])
             # await bot.send_message(message.from_user.id, "Что то пошло не так...")
 
         except ValueError:
