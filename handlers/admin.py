@@ -143,6 +143,7 @@ async def show_alphabet_all_stickers_handler(message: types.Message):
 @dp.callback_query_handler(Text(startswith="alpha_let__"))
 async def all_stickers_pagination_callback_handler(collback: types.CallbackQuery):
     latter = collback.data.split("__")[1]
+    print(latter)
     latter_starts_stickers_list = [x for x in stickers_dict.keys() if x.startswith(latter)]
     print(latter_starts_stickers_list)
     # @dp.callback_query_handler(Text(startswith="all_stick__"))
