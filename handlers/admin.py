@@ -119,7 +119,7 @@ async def load_all_search_stickers(message: types.Message):
         name = next(stickers_names_gen)
         all_names_inline_menu.add(InlineKeyboardButton(f'{name}', url=f'{stickers_dict[name]["url"]}'))
 
-    await bot.send_message(message.from_user.id, f"Всего {stickers_dict.keys()} шт. Отправил первые 20 ...",
+    await bot.send_message(message.from_user.id, f"Всего {len(stickers_dict.keys())} паков. Отправил первые 20 шт...",
                            reply_markup=all_names_inline_menu)
     await bot.send_message(message.from_user.id, "...",
                            reply_markup=InlineKeyboardMarkup(row_width=2)
