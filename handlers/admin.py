@@ -124,7 +124,8 @@ async def show_alphabet_all_stickers_handler(message: types.Message):
     alphabet_pagin_kb = InlineKeyboardMarkup(row_width=10)
     for letter in alphabet_ru:
         alphabet_pagin_kb.insert(InlineKeyboardButton(f"{letter}", callback_data=f"alpha_let__{letter}"))
-    await bot.send_message(message.from_user.id, f"Всего {len(stickers_dict.keys())} паков. С алфавитным указателем будет наверно проще... ",
+    await bot.send_message(message.from_user.id,
+                           f"Всего {len(stickers_dict.keys())} паков. С алфавитным указателем будет наверно проще... ",
                            reply_markup=alphabet_pagin_kb)
     # global stickers_names_gen
     # for x in range(0, 50):
@@ -140,14 +141,16 @@ async def show_alphabet_all_stickers_handler(message: types.Message):
     #                             InlineKeyboardButton("Надоело", callback_data="all_stick__enough")))
     #
 
+
 @dp.callback_query_handler(Text(startswith="alpha_let__"))
 async def all_stickers_pagination_callback_handler(collback: types.CallbackQuery):
     latter = collback.data.split("__")[1]
     print(latter)
-    latter_starts_stickers_list = [x for x in stickers_dict.keys() if x.startswith(latter)]
+    latter_starts_stickers_list = [x for x in stickers_dict.keys() if
+                                   (x.startswith(latter) or x.startswith(latter.upper()))]
     print(latter_starts_stickers_list)
     # @dp.callback_query_handler(Text(startswith="all_stick__"))
-# async def all_stickers_pagination_callback_handler(collback: types.CallbackQuery):
+    # async def all_stickers_pagination_callback_handler(collback: types.CallbackQuery):
     # global stickers_names_gen
     # if collback.data.split("__")[1] == "yet":
     #     all_names_inline_menu.clean()
