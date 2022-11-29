@@ -144,7 +144,7 @@ async def load_word_search_stickers(message: types.Message, state: FSMContext):
                                                parse_mode="HTML",
                                                reply_markup=InlineKeyboardMarkup(row_width=1).add(InlineKeyboardButton(
                                                    text="Подробней / Добавить в телеграм",
-                                                   url=f'{stickers_dict[name]["stickers"]["url"]}')))
+                                                   url=f'{stickers_dict[name]["url"]}')))
 
                 except Exception as ee:
                     print(f"Что то пошло не так {ee}")
