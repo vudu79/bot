@@ -4,7 +4,6 @@ import re
 import shutil
 import time
 from datetime import datetime
-
 from aiogram.dispatcher import FSMContext
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
 from aiogram.dispatcher.filters import Text
@@ -12,7 +11,6 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram import types, Dispatcher
 from aiogram.utils.callback_data import CallbackData
 from aiogram.utils.exceptions import RetryAfter
-
 from utils import *
 from create_bot import dp, bot, calendar_dict, calendar_storage, stickers_list, stickers_dict
 from client.http_client import *
@@ -41,6 +39,7 @@ dbase = DBase()
 storage = MemoryStorage()
 leng_type = ""
 leng_phrase = ""
+stickers_names = any
 
 categories_callback = CallbackData("CategorY__", "page", "category_name")
 
@@ -105,24 +104,38 @@ async def stickers_random_handler(message: types.Message):
     await FSMStickersRandom.count.set()
 
 
-@dp.message_handler(Text(equals="Может найду...", ignore_case=False), state=None)
+@dp.message_handler(Text(equals="Поиск по словам", ignore_case=False), state=None)
 async def stickers_search_handler(message: types.Message):
     await message.answer("Введите слово или фразу для поиска (ru/en)...")
     await FSMStickersSearch.word.set()
 
 
+@dp.message_handler(Text(equals="Показать все", ignore_case=False)
+async def load_all_search_stickers(message: types.Message):
+    global stickers_names
+    stickers_names_gen = (x for x in stickers_dict.keys())
+    all_names_inline_menu = InlineKeyboardMarkup(row_width=4)
+    for x in range(0, 20):
+        name = next(stickers_names_gen)
+        all_names_inline_menu.add(InlineKeyboardButton(f'{name}', url=f'{stickers_dict[name]["url"]}'))
+
+    bot.send_message(message.from_user.id, f"Всего {stickers_dict.keys()} шт. Отправил первые 20 ...", reply_markup=all_names_inline_menu)
+    bot.send_message(message.from_user.id, "...",
+                     reply_markup=InlineKeyboardMarkup(row_width=2)
+                     .row(InlineKeyboardButton("Еще 20 шт", callback_data="all_stick__eat"), InlineKeyboardButton("Еще 20 шт", callback_data="all_stick__enough")))
+
 @dp.message_handler(state=FSMStickersSearch.word)
 async def load_word_search_stickers(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
+
         data['word'] = message.text
         stickers_names = stickers_dict.keys()
         matches_list = list(filter(lambda x: data['word'] in x, stickers_names))
         # await bot.send_message(message.from_user.id, f'{matches_list}')
-        for x in stickers_names:
-            await bot.send_message(message.from_user.id, f'{x}')
+        # for x in stickers_names:
+        #     await bot.send_message(message.from_user.id, f'{x}')
 
         if len(matches_list) > 0:
-
             for name in matches_list:
                 bold_name = name[:name.index(data['word'])] + \
                             "<b>" + data['word'].upper() + "</b>" \
@@ -138,7 +151,6 @@ async def load_word_search_stickers(message: types.Message, state: FSMContext):
                 else:
                     for x in range(0, 3):
                         media.attach_photo(types.InputMediaPhoto(img_list[x]))
-
                 try:
                     if len(media.media) > 0:
                         print(f'Медиа группа - {len(media.media)} ')
@@ -149,12 +161,10 @@ async def load_word_search_stickers(message: types.Message, state: FSMContext):
                                                reply_markup=InlineKeyboardMarkup(row_width=1).add(InlineKeyboardButton(
                                                    text="Подробней / Добавить в телеграм",
                                                    url=f'{stickers_dict[name]["url"]}')))
-
                 except Exception as ee:
                     print(f"Что то пошло не так {ee}")
                     with open("static/bad_pack1.txt", 'a') as file:
                         file.write(name)
-
         else:
             await bot.send_message(message.from_user.id, "По вашему запросу ничего не найдено")
     await state.finish()

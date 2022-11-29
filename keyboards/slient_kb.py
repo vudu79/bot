@@ -34,9 +34,10 @@ reply_keyboard_mems = ReplyKeyboardMarkup(resize_keyboard=True)
 reply_keyboard_mems.row(random_btn, trend_btn).row(main_menu_button)
 
 random_sticker_btn = KeyboardButton('Случайные паки')
-search_sticker_btn = KeyboardButton('Может найду...')
+search_sticker_btn = KeyboardButton('Поиск по словам')
+search_all_sticker_btn = KeyboardButton('Показать все')
 reply_keyboard_stickers = ReplyKeyboardMarkup(resize_keyboard=True)
-reply_keyboard_stickers.row(random_sticker_btn, search_sticker_btn).row(main_menu_button)
+reply_keyboard_stickers.row(random_sticker_btn, search_sticker_btn).row(search_all_sticker_btn).row(main_menu_button)
 
 inline_keyboard_lang = InlineKeyboardMarkup(row_width=2)
 rus_button = InlineKeyboardButton(text="Русский", callback_data="leng__rus_")
