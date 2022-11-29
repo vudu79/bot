@@ -141,7 +141,7 @@ async def load_word_search_stickers(message: types.Message, state: FSMContext):
                         print(f'Медиа группа - {len(media.media)} ')
 
                         await bot.send_media_group(message.from_user.id, media=media)
-                        await bot.send_message(message.from_user.id, f'{bold_name}',
+                        await bot.send_message(message.from_user.id, f'{bold_name.upper()}',
                                                parse_mode="HTML",
                                                reply_markup=InlineKeyboardMarkup(row_width=1).add(InlineKeyboardButton(
                                                    text="Подробней / Добавить в телеграм",
