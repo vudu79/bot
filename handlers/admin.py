@@ -110,7 +110,7 @@ async def stickers_search_handler(message: types.Message):
     await FSMStickersSearch.word.set()
 
 
-@dp.message_handler(Text(equals="Показать все", ignore_case=False)
+@dp.message_handler(Text(equals="Показать все", ignore_case=False))
 async def load_all_search_stickers(message: types.Message):
     global stickers_names
     stickers_names_gen = (x for x in stickers_dict.keys())
@@ -119,10 +119,13 @@ async def load_all_search_stickers(message: types.Message):
         name = next(stickers_names_gen)
         all_names_inline_menu.add(InlineKeyboardButton(f'{name}', url=f'{stickers_dict[name]["url"]}'))
 
-    bot.send_message(message.from_user.id, f"Всего {stickers_dict.keys()} шт. Отправил первые 20 ...", reply_markup=all_names_inline_menu)
-    bot.send_message(message.from_user.id, "...",
-                     reply_markup=InlineKeyboardMarkup(row_width=2)
-                     .row(InlineKeyboardButton("Еще 20 шт", callback_data="all_stick__eat"), InlineKeyboardButton("Еще 20 шт", callback_data="all_stick__enough")))
+    await bot.send_message(message.from_user.id, f"Всего {stickers_dict.keys()} шт. Отправил первые 20 ...",
+                           reply_markup=all_names_inline_menu)
+    await bot.send_message(message.from_user.id, "...",
+                           reply_markup=InlineKeyboardMarkup(row_width=2)
+                           .row(InlineKeyboardButton("Еще 20 шт", callback_data="all_stick__eat"),
+                                InlineKeyboardButton("Еще 20 шт", callback_data="all_stick__enough")))
+
 
 @dp.message_handler(state=FSMStickersSearch.word)
 async def load_word_search_stickers(message: types.Message, state: FSMContext):
