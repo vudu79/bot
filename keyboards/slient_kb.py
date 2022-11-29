@@ -43,3 +43,5 @@ inline_keyboard_lang = InlineKeyboardMarkup(row_width=2)
 rus_button = InlineKeyboardButton(text="Русский", callback_data="leng__rus_")
 english_button = InlineKeyboardButton(text="English", callback_data="leng__engl_")
 inline_keyboard_lang.row(rus_button, english_button)
+
+all_names_inline_menu = InlineKeyboardMarkup(row_width=4)
