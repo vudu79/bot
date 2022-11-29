@@ -140,7 +140,6 @@ async def load_word_search_stickers(message: types.Message, state: FSMContext):
                     if len(media.media) > 0:
                         print(f'Медиа группа - {len(media.media)} ')
 
-                        await bot.send_message(message.from_user.id, "⌛")
                         await bot.send_media_group(message.from_user.id, media=media)
                         await bot.send_message(message.from_user.id, f'{bold_name}',
                                                parse_mode="HTML",
