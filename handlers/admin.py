@@ -20,7 +20,7 @@ from keyboards import reply_keyboard_main_menu, inline_keyboard_lang, reply_keyb
     reply_keyboard_mems, reply_keyboard_stickers, all_names_inline_menu
 
 alphabet_ru = ["а", "б", "в", "г", "д", "е", "ё", "ж", "з", "и", "й", "к", "л", "м", "н", "о", "п", "р", "с", "т", "у",
-               "ф", "х", "ц", "ч", "ш", "щ", "ы", "э", "ю", "я"]
+               "ф", "х", "ц", "ч", "ш", "щ", "э", "ю", "я"]
 
 alphabet_en = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r",
                "s", "t", "u", "v", "w", "x", "y", "z"]
@@ -140,9 +140,13 @@ async def show_alphabet_all_stickers_handler(message: types.Message):
     #                             InlineKeyboardButton("Надоело", callback_data="all_stick__enough")))
     #
 
-
-@dp.callback_query_handler(Text(startswith="all_stick__"))
+@dp.callback_query_handler(Text(startswith="alpha_let__"))
 async def all_stickers_pagination_callback_handler(collback: types.CallbackQuery):
+    latter = collback.data.split("__")[1]
+    latter_starts_stickers_list = [x for x in stickers_dict.keys() if x.startswith(latter)]
+    print(latter_starts_stickers_list)
+    # @dp.callback_query_handler(Text(startswith="all_stick__"))
+# async def all_stickers_pagination_callback_handler(collback: types.CallbackQuery):
     # global stickers_names_gen
     # if collback.data.split("__")[1] == "yet":
     #     all_names_inline_menu.clean()
