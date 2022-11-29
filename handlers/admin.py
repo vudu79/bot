@@ -104,6 +104,7 @@ async def stickers_random_handler(message: types.Message):
     await message.answer("Сколько паков найти?")
     await FSMStickersRandom.count.set()
 
+
 @dp.message_handler(Text(equals="Может найду...", ignore_case=False), state=None)
 async def stickers_search_handler(message: types.Message):
     await message.answer("Введите ключевое слово для поиска...")
@@ -116,10 +117,19 @@ async def load_word_search_stickers(message: types.Message, state: FSMContext):
         data['word'] = message.text
         stickers_names = stickers_dict.keys()
         matches_list = list(filter(lambda x: data['word'] in x, stickers_names))
-        await bot.send_message(message.from_user.id, f'{matches_list}')
+        if len(matches_list) > 0:
+            search_result_inline_kb = InlineKeyboardMarkup(row_width=1)
+            for name in matches_list:
+                bold_name = name[:name.index(data['word'])] + \
+                            "<b>" + data['word'] + "</b>" \
+                            + name[name.index(data['word'])
+                                   + len(data['word']):]
 
+                search_result_inline_kb.add(InlineKeyboardButton(f'{bold_name}', callback_data=f'stiker__{bold_name}'))
+            await bot.send_message(message.from_user.id, "Вот что нашел ...", reply_markup=search_result_inline_kb)
+        else:
+            await bot.send_message(message.from_user.id, "По вашему запросу ничего не найдено")
     await state.finish()
-
 
 
 @dp.message_handler(state=FSMStickersRandom.count)
