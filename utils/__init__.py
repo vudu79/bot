@@ -1,1 +1,1 @@
-from utils.utils import get_pagination_keyboard, get_random_stickers, phraze_list
+from utils.utils import get_pagination_keyboard, phraze_list
