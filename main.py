@@ -63,7 +63,7 @@ async def bot_start(logger: logging.Logger) -> None:
     # await proceed_schemas(async_engine, BaseModel.metadata)
     # await dp.start_polling(bot, session_maker=session_maker, logger=logger, redis=redis)
 
-    await dp.start_polling(bot)
+    await dp.start_polling(bot, skip_updates=True)
 
 
 def setup_env():

@@ -19,6 +19,12 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from keyboards import reply_keyboard_main_menu, inline_keyboard_lang, reply_keyboard_cards, reply_keyboard_gifs, \
     reply_keyboard_mems, reply_keyboard_stickers, all_names_inline_menu
 
+alphabet_ru = ["а", "б", "в", "г", "д", "е", "ё", "ж", "з", "и", "й", "к", "л", "м", "н", "о", "п", "р", "с", "т", "у",
+               "ф", "х", "ц", "ч", "ш", "щ", "ы", "э", "ю", "я"]
+
+alphabet_en = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r",
+               "s", "t", "u", "v", "w", "x", "y", "z"]
+
 
 class FSMSearch(StatesGroup):
     subj = State()
@@ -34,12 +40,14 @@ class FSMStickersSearch(StatesGroup):
     count = State()
 
 
+stickers_callback = CallbackData("start", "end")
+
 gifs = dict()
 dbase = DBase()
 storage = MemoryStorage()
 leng_type = ""
 leng_phrase = ""
-stickers_names_gen = (x for x in stickers_dict.keys())
+# stickers_names_gen = (x for x in stickers_dict.keys())
 
 categories_callback = CallbackData("CategorY__", "page", "category_name")
 
@@ -111,37 +119,44 @@ async def stickers_search_handler(message: types.Message):
 
 
 @dp.message_handler(Text(equals="Показать все", ignore_case=False))
-async def show_all_stickers_handler(message: types.Message):
-    global stickers_names_gen
-    for x in range(0, 50):
-        name = next(stickers_names_gen)
-        all_names_inline_menu.clean()
-        all_names_inline_menu.add(InlineKeyboardButton(f'{name}', url=f'{stickers_dict[name]["url"]}'))
-
-    await bot.send_message(message.from_user.id, f"Всего {len(stickers_dict.keys())} паков. Отправил первые 50 шт...",
-                           reply_markup=all_names_inline_menu)
-    await bot.send_message(message.from_user.id, "{Хватит?}",
-                           reply_markup=InlineKeyboardMarkup(row_width=2)
-                           .row(InlineKeyboardButton("Продолжаем", callback_data="all_stick__yet"),
-                                InlineKeyboardButton("Надоело", callback_data="all_stick__enough")))
+async def show_alphabet_all_stickers_handler(message: types.Message):
+    stickers_names = stickers_dict.keys()
+    alphabet_pagin_kb = InlineKeyboardMarkup(row_width=10)
+    for letter in alphabet_ru:
+        alphabet_pagin_kb.add(InlineKeyboardButton(f"{letter}", callback_data=f"alpha_let__{letter}"))
+    await bot.send_message(message.from_user.id, f"Всего {len(stickers_dict.keys())} паков. С алфавитным указателем будет наверно проще... ",
+                           reply_markup=alphabet_pagin_kb)
+    # global stickers_names_gen
+    # for x in range(0, 50):
+    #     name = next(stickers_names_gen)
+    #     all_names_inline_menu.clean()
+    #     all_names_inline_menu.add(InlineKeyboardButton(f'{name}', url=f'{stickers_dict[name]["url"]}'))
+    #
+    # await bot.send_message(message.from_user.id, f"Всего {len(stickers_dict.keys())} паков. Отправил первые 50 шт...",
+    #                        reply_markup=all_names_inline_menu)
+    # await bot.send_message(message.from_user.id, "{Хватит?}",
+    #                        reply_markup=InlineKeyboardMarkup(row_width=2)
+    #                        .row(InlineKeyboardButton("Продолжаем", callback_data="all_stick__yet"),
+    #                             InlineKeyboardButton("Надоело", callback_data="all_stick__enough")))
+    #
 
 
 @dp.callback_query_handler(Text(startswith="all_stick__"))
 async def all_stickers_pagination_callback_handler(collback: types.CallbackQuery):
-    global stickers_names_gen
-    if collback.data.split("__")[1] == "yet":
-        all_names_inline_menu.clean()
-        for x in range(0, 50):
-            name = next(stickers_names_gen)
-            all_names_inline_menu.add(InlineKeyboardButton(f'{name}', url=f'{stickers_dict[name]["url"]}'))
-
-        await bot.send_message(collback.from_user.id,
-                               f"Еще 50 шт...",
-                               reply_markup=all_names_inline_menu)
-        await bot.send_message(collback.from_user.id, "{Хватит?}",
-                               reply_markup=InlineKeyboardMarkup(row_width=2)
-                               .row(InlineKeyboardButton("Продолжаем", callback_data="all_stick__yet"),
-                                    InlineKeyboardButton("Надоело", callback_data="all_stick__enough")))
+    # global stickers_names_gen
+    # if collback.data.split("__")[1] == "yet":
+    #     all_names_inline_menu.clean()
+    #     for x in range(0, 50):
+    #         name = next(stickers_names_gen)
+    #         all_names_inline_menu.add(InlineKeyboardButton(f'{name}', url=f'{stickers_dict[name]["url"]}'))
+    #
+    #     await bot.send_message(collback.from_user.id,
+    #                            f"Еще 50 шт...",
+    #                            reply_markup=all_names_inline_menu)
+    #     await bot.send_message(collback.from_user.id, "{Хватит?}",
+    #                            reply_markup=InlineKeyboardMarkup(row_width=2)
+    #                            .row(InlineKeyboardButton("Продолжаем", callback_data="all_stick__yet"),
+    #                                 InlineKeyboardButton("Надоело", callback_data="all_stick__enough")))
 
     await collback.answer()
 
@@ -624,7 +639,7 @@ def register_handlers_admin(dp: Dispatcher):
 
     dp.register_message_handler(stickers_random_handler, Text(equals="Случайные паки", ignore_case=False))
     dp.register_message_handler(stickers_search_handler, Text(equals="Может найду...", ignore_case=False))
-    dp.register_message_handler(show_all_stickers_handler, Text(equals="Показать все", ignore_case=False))
+    dp.register_message_handler(show_alphabet_all_stickers_handler, Text(equals="Показать все", ignore_case=False))
     dp.register_callback_query_handler(all_stickers_pagination_callback_handler, Text(startswith="all_stick__"))
 
     dp.register_message_handler(category_index_handler, Text(equals="Популярные категории", ignore_case=False))
