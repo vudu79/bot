@@ -17,7 +17,7 @@ from client.http_client import *
 from database import DBase
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from keyboards import reply_keyboard_main_menu, inline_keyboard_lang, reply_keyboard_cards, reply_keyboard_gifs, \
-    reply_keyboard_mems, reply_keyboard_stickers
+    reply_keyboard_mems, reply_keyboard_stickers, all_names_inline_menu
 
 
 class FSMSearch(StatesGroup):
@@ -39,7 +39,7 @@ dbase = DBase()
 storage = MemoryStorage()
 leng_type = ""
 leng_phrase = ""
-stickers_names = any
+stickers_names_gen = (x for x in stickers_dict.keys())
 
 categories_callback = CallbackData("CategorY__", "page", "category_name")
 
@@ -111,12 +111,11 @@ async def stickers_search_handler(message: types.Message):
 
 
 @dp.message_handler(Text(equals="Показать все", ignore_case=False))
-async def load_all_search_stickers(message: types.Message):
-    global stickers_names
-    stickers_names_gen = (x for x in stickers_dict.keys())
-    all_names_inline_menu = InlineKeyboardMarkup(row_width=4)
+async def show_all_stickers_handler(message: types.Message):
+    global stickers_names_gen
     for x in range(0, 50):
         name = next(stickers_names_gen)
+        all_names_inline_menu.clean()
         all_names_inline_menu.add(InlineKeyboardButton(f'{name}', url=f'{stickers_dict[name]["url"]}'))
 
     await bot.send_message(message.from_user.id, f"Всего {len(stickers_dict.keys())} паков. Отправил первые 50 шт...",
@@ -125,6 +124,26 @@ async def load_all_search_stickers(message: types.Message):
                            reply_markup=InlineKeyboardMarkup(row_width=2)
                            .row(InlineKeyboardButton("Продолжаем", callback_data="all_stick__yet"),
                                 InlineKeyboardButton("Надоело", callback_data="all_stick__enough")))
+
+
+@dp.callback_query_handler(Text(startswith="all_stick__"))
+async def all_stickers_pagination_callback_handler(collback: types.CallbackQuery):
+    global stickers_names_gen
+    if collback.data.split("__")[1] == "yet":
+        all_names_inline_menu.clean()
+        for x in range(0, 50):
+            name = next(stickers_names_gen)
+            all_names_inline_menu.add(InlineKeyboardButton(f'{name}', url=f'{stickers_dict[name]["url"]}'))
+
+        await bot.send_message(collback.from_user.id,
+                               f"Еще 50 шт...",
+                               reply_markup=all_names_inline_menu)
+        await bot.send_message(collback.from_user.id, "{Хватит?}",
+                               reply_markup=InlineKeyboardMarkup(row_width=2)
+                               .row(InlineKeyboardButton("Продолжаем", callback_data="all_stick__yet"),
+                                    InlineKeyboardButton("Надоело", callback_data="all_stick__enough")))
+
+    await collback.answer()
 
 
 @dp.message_handler(state=FSMStickersSearch.word)
@@ -217,11 +236,6 @@ async def load_count_random_stickers(message: types.Message, state: FSMContext):
             # await bot.send_message(message.from_user.id, "Что то пошло не так...")
 
         await state.finish()
-
-
-@dp.message_handler(Text(equals="Может найду...", ignore_case=False))
-async def stickers_search_handler(message: types.Message):
-    pass
 
 
 @dp.message_handler(Text(equals="Календарь", ignore_case=False), state=None)
@@ -610,11 +624,13 @@ def register_handlers_admin(dp: Dispatcher):
 
     dp.register_message_handler(stickers_random_handler, Text(equals="Случайные паки", ignore_case=False))
     dp.register_message_handler(stickers_search_handler, Text(equals="Может найду...", ignore_case=False))
+    dp.register_message_handler(show_all_stickers_handler, Text(equals="Показать все", ignore_case=False))
+    dp.register_callback_query_handler(all_stickers_pagination_callback_handler, Text(startswith="all_stick__"))
 
     dp.register_message_handler(category_index_handler, Text(equals="Популярные категории", ignore_case=False))
 
-    dp.register_callback_query_handler(carendar_holiday_message_handler, Text(equals="Календарь", ignore_case=False))
     dp.register_callback_query_handler(today_holiday_message_handler, Text(equals="Сегодня", ignore_case=False))
+    dp.register_callback_query_handler(carendar_holiday_message_handler, Text(equals="Календарь", ignore_case=False))
 
     dp.register_callback_query_handler(show_month_events_callback_handler, Text(startswith="month__"), state=None)
 
