@@ -123,7 +123,7 @@ async def show_alphabet_all_stickers_handler(message: types.Message):
     stickers_names = stickers_dict.keys()
     alphabet_pagin_kb = InlineKeyboardMarkup(row_width=10)
     for letter in alphabet_ru:
-        alphabet_pagin_kb.add(InlineKeyboardButton(f"{letter}", callback_data=f"alpha_let__{letter}"))
+        alphabet_pagin_kb.insert(InlineKeyboardButton(f"{letter}", callback_data=f"alpha_let__{letter}"))
     await bot.send_message(message.from_user.id, f"Всего {len(stickers_dict.keys())} паков. С алфавитным указателем будет наверно проще... ",
                            reply_markup=alphabet_pagin_kb)
     # global stickers_names_gen
