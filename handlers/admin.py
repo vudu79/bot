@@ -107,7 +107,7 @@ async def stickers_random_handler(message: types.Message):
 
 @dp.message_handler(Text(equals="Может найду...", ignore_case=False), state=None)
 async def stickers_search_handler(message: types.Message):
-    await message.answer("Введите ключевое слово для поиска...")
+    await message.answer("Введите слово или фразу для поиска (ru/en)...")
     await FSMStickersSearch.word.set()
 
 
@@ -129,11 +129,11 @@ async def load_word_search_stickers(message: types.Message, state: FSMContext):
                 media = types.MediaGroup()
                 img_list = stickers_dict[name]["stickers"]
 
-                if len(img_list) <= 3:
+                if len(img_list) <= 4:
                     for img in img_list:
                         media.attach_photo(types.InputMediaPhoto(img))
                 else:
-                    for x in range(0, 2):
+                    for x in range(0, 3):
                         media.attach_photo(types.InputMediaPhoto(img_list[x]))
 
                 try:
@@ -141,7 +141,7 @@ async def load_word_search_stickers(message: types.Message, state: FSMContext):
                         print(f'Медиа группа - {len(media.media)} ')
 
                         await bot.send_media_group(message.from_user.id, media=media)
-                        await bot.send_message(message.from_user.id, f'<b>{bold_name}</b>',
+                        await bot.send_message(message.from_user.id, f'{bold_name}',
                                                parse_mode="HTML",
                                                reply_markup=InlineKeyboardMarkup(row_width=1).add(InlineKeyboardButton(
                                                    text="Подробней / Добавить в телеграм",
