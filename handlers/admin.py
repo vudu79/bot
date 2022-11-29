@@ -118,7 +118,8 @@ async def load_word_search_stickers(message: types.Message, state: FSMContext):
         stickers_names = stickers_dict.keys()
         matches_list = list(filter(lambda x: data['word'] in x, stickers_names))
         # await bot.send_message(message.from_user.id, f'{matches_list}')
-        await bot.send_message(message.from_user.id, f'{stickers_names}')
+        for x in stickers_names:
+            await bot.send_message(message.from_user.id, f'{x}')
 
         if len(matches_list) > 0:
 
