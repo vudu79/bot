@@ -12,16 +12,38 @@ phraze_list = ["Секундочку, склеиваю фотки...", "мину
                "Приходите попозже, устал, у меня перерыв...", "Минутку подождите, я форматирую ваши диски))"]
 
 
-def get_random_stickers(count: int):
-    media = types.MediaGroup()
-    result_list = []
 
-    while len(result_list) < count:
-        random_item = random.choice(stickers_list)
-        if random_item not in result_list:
-            result_list.append(random_item)
 
-    return result_list
+
+# def get_stickers(count: int, massage: types.Message, img_list: list):
+#     media = types.MediaGroup()
+#     if len(img_list) <= 6:
+#         for img in img_list:
+#             media.attach_photo(types.InputMediaPhoto(img))
+#     else:
+#         for x in range(0, 5):
+#             media.attach_photo(types.InputMediaPhoto(img_list[x]))
+#
+#     try:
+#         if len(media.media) > 0:
+#             print(f'Медиа группа - {len(media.media)} ')
+#
+#             await bot.send_message(message.from_user.id, f'<em>{random.choice(phraze_list)}</em>',
+#                                    parse_mode="HTML")
+#
+#             await bot.send_media_group(message.from_user.id, media=media)
+#             await bot.send_message(message.from_user.id, f'Стикеры <b>"{random_sticker_dict["name"]}"</b>',
+#                                    parse_mode="HTML",
+#                                    reply_markup=InlineKeyboardMarkup(row_width=1).add(InlineKeyboardButton(
+#                                        text="Добавить в телеграм", url=f'{random_sticker_dict["url"]}')))
+#             count = count + 1
+#     except Exception as ee:
+#         print(f"Что то пошло не так {ee}")
+#         with open("static/bad_pack.txt", 'a') as file:
+#             file.write(random_sticker_dict["name"])
+#
+
+# await bot.send_message(message.from_user.id, "Что то пошло не так...")
 
 
 def get_pagination_keyboard(page: int = 0, category_list: any = None,

@@ -118,15 +118,39 @@ async def load_word_search_stickers(message: types.Message, state: FSMContext):
         stickers_names = stickers_dict.keys()
         matches_list = list(filter(lambda x: data['word'] in x, stickers_names))
         if len(matches_list) > 0:
-            search_result_inline_kb = InlineKeyboardMarkup(row_width=1)
+
             for name in matches_list:
                 bold_name = name[:name.index(data['word'])] + \
                             "<b>" + data['word'] + "</b>" \
                             + name[name.index(data['word'])
                                    + len(data['word']):]
 
-                search_result_inline_kb.add(InlineKeyboardButton(f'{bold_name}', callback_data=f'stiker__{bold_name}'))
-            await bot.send_message(message.from_user.id, "Вот что нашел ...", reply_markup=search_result_inline_kb)
+                media = types.MediaGroup()
+                img_list = stickers_dict[name]["stickers"]
+
+                if len(img_list) <= 3:
+                    for img in img_list:
+                        media.attach_photo(types.InputMediaPhoto(img))
+                else:
+                    for x in range(0, 2):
+                        media.attach_photo(types.InputMediaPhoto(img_list[x]))
+
+                try:
+                    if len(media.media) > 0:
+                        print(f'Медиа группа - {len(media.media)} ')
+
+                        await bot.send_media_group(message.from_user.id, media=media)
+                        await bot.send_message(message.from_user.id, f'<b>{bold_name}</b>',
+                                               parse_mode="HTML",
+                                               reply_markup=InlineKeyboardMarkup(row_width=1).add(InlineKeyboardButton(
+                                                   text="Подробней / Добавить в телеграм",
+                                                   url=f'{stickers_dict[name]["stickers"]["url"]}')))
+
+                except Exception as ee:
+                    print(f"Что то пошло не так {ee}")
+                    with open("static/bad_pack1.txt", 'a') as file:
+                        file.write(name)
+
         else:
             await bot.send_message(message.from_user.id, "По вашему запросу ничего не найдено")
     await state.finish()
@@ -147,8 +171,8 @@ async def load_count_random_stickers(message: types.Message, state: FSMContext):
             while count < packs_count:
                 random_sticker_dict = random.choice(stickers_list)
                 img_list = random_sticker_dict["stickers"]
-                media = types.MediaGroup()
 
+                media = types.MediaGroup()
                 if len(img_list) <= 6:
                     for img in img_list:
                         media.attach_photo(types.InputMediaPhoto(img))
