@@ -131,8 +131,9 @@ async def show_alphabet_all_stickers_handler(message: types.Message):
                                                        callback_data=stickers_paginate_callback
                                                        .new(filter="check", start=page[0], end=page[1])))
 
-    for title in stickers_titles:
-        stickers_titles_inline_kb.insert(InlineKeyboardButton(f"{title}", url=f'{stickers_dict[title]["url"]}'))
+    for x in range(0, 49):
+        stickers_titles_inline_kb.insert(
+            InlineKeyboardButton(f"{stickers_titles[x]}", url=f'{stickers_dict[stickers_titles[x]]["url"]}'))
     await bot.send_message(message.from_user.id,
                            f"Всего {len(stickers_dict.keys())} паков, на странице по 50 шт.",
                            reply_markup=stickers_titles_inline_kb)
