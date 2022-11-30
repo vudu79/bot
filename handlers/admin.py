@@ -40,7 +40,7 @@ class FSMStickersSearch(StatesGroup):
     count = State()
 
 
-stickers_callback = CallbackData("start", "end")
+stickers_paginate_callback = CallbackData("filter", "start", "end", "focus")
 
 gifs = dict()
 dbase = DBase()
@@ -120,13 +120,28 @@ async def stickers_search_handler(message: types.Message):
 
 @dp.message_handler(Text(equals="Показать все", ignore_case=False))
 async def show_alphabet_all_stickers_handler(message: types.Message):
-    stickers_names = stickers_dict.keys()
-    alphabet_pagin_kb = InlineKeyboardMarkup(row_width=10)
-    for letter in alphabet_ru:
-        alphabet_pagin_kb.insert(InlineKeyboardButton(f"{letter}", callback_data=f"alpha_let__{letter}"))
+    stickers_titles = stickers_dict.keys()
+    stickers_titles_inline_kb = InlineKeyboardMarkup(row_width=3)
+    paginate_inline_kb = InlineKeyboardMarkup(row_width=10)
+
+    paginate_list = get_pagination_list(len(stickers_titles))
+    for num, page in enumerate(paginate_list):
+        activ = "👉" if num == 1 else ""
+        paginate_inline_kb.insert(InlineKeyboardButton(f'{activ}{num}',
+                                                       callback_data=stickers_paginate_callback
+                                                       .new(filter="check", start=page[0]
+                                                            , end=page[1]
+                                                            , focus=False)))
+
+    for title in stickers_titles:
+        stickers_titles_inline_kb.insert(InlineKeyboardButton(f"{title}", url=f'{stickers_dict[title]["url"]}'))
     await bot.send_message(message.from_user.id,
-                           f"Всего {len(stickers_dict.keys())} паков. С алфавитным указателем будет наверно проще... ",
-                           reply_markup=alphabet_pagin_kb)
+                           f"Всего {len(stickers_dict.keys())} паков, на странице по 50 шт.",
+                           reply_markup=stickers_titles_inline_kb)
+
+    await bot.send_message(message.from_user.id,
+                           "...", reply_markup=paginate_inline_kb)
+
     # global stickers_names_gen
     # for x in range(0, 50):
     #     name = next(stickers_names_gen)
@@ -148,7 +163,9 @@ async def all_stickers_pagination_callback_handler(collback: types.CallbackQuery
     print(latter)
     latter_starts_stickers_list = [x for x in stickers_dict.keys() if
                                    (x.startswith(latter) or x.startswith(latter.upper()))]
-    print(latter_starts_stickers_list)
+    if len(latter_starts_stickers_list) > 50:
+        pass
+
     # @dp.callback_query_handler(Text(startswith="all_stick__"))
     # async def all_stickers_pagination_callback_handler(collback: types.CallbackQuery):
     # global stickers_names_gen
