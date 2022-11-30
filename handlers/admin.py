@@ -129,9 +129,7 @@ async def show_alphabet_all_stickers_handler(message: types.Message):
         activ = "👉" if num == 1 else ""
         paginate_inline_kb.insert(InlineKeyboardButton(f'{activ}{num}',
                                                        callback_data=stickers_paginate_callback
-                                                       .new(filter="check", start=page[0]
-                                                            , end=page[1]
-                                                            , focus=False)))
+                                                       .new(filter="check", start=page[0], end=page[1])))
 
     for title in stickers_titles:
         stickers_titles_inline_kb.insert(InlineKeyboardButton(f"{title}", url=f'{stickers_dict[title]["url"]}'))
