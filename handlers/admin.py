@@ -40,7 +40,14 @@ class FSMStickersSearch(StatesGroup):
     count = State()
 
 
-stickers_paginate_callback = CallbackData("filter", "start", "end")
+# class StickersPaginateCallback(CallbackData, prefix="my"):
+#     filter: str
+#     start: int
+#     end: int
+#     focus: bool
+
+
+stickers_paginate_callback = CallbackData("action", "start_and")
 
 gifs = dict()
 dbase = DBase()
@@ -128,8 +135,8 @@ async def show_alphabet_all_stickers_handler(message: types.Message):
     for num, page in enumerate(paginate_list):
         activ = "👉" if num == 1 else ""
         paginate_inline_kb.insert(InlineKeyboardButton(f'{activ}{num}',
-                                                       callback_data=stickers_paginate_callback
-                                                       .new(filter="check", start=page[0], end=page[1])))
+                                                       callback_data=stickers_paginate_callback.new(action="check",
+                                                                                                    start_and=page)))
 
     for x in range(0, 49):
         stickers_titles_inline_kb.insert(
@@ -155,34 +162,27 @@ async def show_alphabet_all_stickers_handler(message: types.Message):
     #                             InlineKeyboardButton("Надоело", callback_data="all_stick__enough")))
     #
 
+    @dp.callback_query_handler(stickers_paginate_callback.filter(action="check"))
+    async def all_stickers_pagination_callback_handler(collback: types.CallbackQuery, callback_data: dict):
+        bot.send_message(collback.from_user.id, callback_data["start_and"])
+        # @dp.callback_query_handler(Text(startswith="all_stick__"))
+        # async def all_stickers_pagination_callback_handler(collback: types.CallbackQuery):
+        # global stickers_names_gen
+        # if collback.data.split("__")[1] == "yet":
+        #     all_names_inline_menu.clean()
+        #     for x in range(0, 50):
+        #         name = next(stickers_names_gen)
+        #         all_names_inline_menu.add(InlineKeyboardButton(f'{name}', url=f'{stickers_dict[name]["url"]}'))
+        #
+        #     await bot.send_message(collback.from_user.id,
+        #                            f"Еще 50 шт...",
+        #                            reply_markup=all_names_inline_menu)
+        #     await bot.send_message(collback.from_user.id, "{Хватит?}",
+        #                            reply_markup=InlineKeyboardMarkup(row_width=2)
+        #                            .row(InlineKeyboardButton("Продолжаем", callback_data="all_stick__yet"),
+        #                                 InlineKeyboardButton("Надоело", callback_data="all_stick__enough")))
 
-@dp.callback_query_handler(Text(startswith="alpha_let__"))
-async def all_stickers_pagination_callback_handler(collback: types.CallbackQuery):
-    latter = collback.data.split("__")[1]
-    print(latter)
-    latter_starts_stickers_list = [x for x in stickers_dict.keys() if
-                                   (x.startswith(latter) or x.startswith(latter.upper()))]
-    if len(latter_starts_stickers_list) > 50:
-        pass
-
-    # @dp.callback_query_handler(Text(startswith="all_stick__"))
-    # async def all_stickers_pagination_callback_handler(collback: types.CallbackQuery):
-    # global stickers_names_gen
-    # if collback.data.split("__")[1] == "yet":
-    #     all_names_inline_menu.clean()
-    #     for x in range(0, 50):
-    #         name = next(stickers_names_gen)
-    #         all_names_inline_menu.add(InlineKeyboardButton(f'{name}', url=f'{stickers_dict[name]["url"]}'))
-    #
-    #     await bot.send_message(collback.from_user.id,
-    #                            f"Еще 50 шт...",
-    #                            reply_markup=all_names_inline_menu)
-    #     await bot.send_message(collback.from_user.id, "{Хватит?}",
-    #                            reply_markup=InlineKeyboardMarkup(row_width=2)
-    #                            .row(InlineKeyboardButton("Продолжаем", callback_data="all_stick__yet"),
-    #                                 InlineKeyboardButton("Надоело", callback_data="all_stick__enough")))
-
-    await collback.answer()
+        await collback.answer()
 
 
 @dp.message_handler(state=FSMStickersSearch.word)
@@ -219,9 +219,10 @@ async def load_word_search_stickers(message: types.Message, state: FSMContext):
                         await bot.send_media_group(message.from_user.id, media=media)
                         await bot.send_message(message.from_user.id, f'{bold_name}',
                                                parse_mode="HTML",
-                                               reply_markup=InlineKeyboardMarkup(row_width=1).add(InlineKeyboardButton(
-                                                   text="Подробней / Добавить в телеграм",
-                                                   url=f'{stickers_dict[name]["url"]}')))
+                                               reply_markup=InlineKeyboardMarkup(row_width=1).add(
+                                                   InlineKeyboardButton(
+                                                       text="Подробней / Добавить в телеграм",
+                                                       url=f'{stickers_dict[name]["url"]}')))
                 except Exception as ee:
                     print(f"Что то пошло не так {ee}")
                     with open("static/bad_pack1.txt", 'a') as file:
@@ -263,10 +264,13 @@ async def load_count_random_stickers(message: types.Message, state: FSMContext):
                                                parse_mode="HTML")
 
                         await bot.send_media_group(message.from_user.id, media=media)
-                        await bot.send_message(message.from_user.id, f'Стикеры <b>"{random_sticker_dict["name"]}"</b>',
+                        await bot.send_message(message.from_user.id,
+                                               f'Стикеры <b>"{random_sticker_dict["name"]}"</b>',
                                                parse_mode="HTML",
-                                               reply_markup=InlineKeyboardMarkup(row_width=1).add(InlineKeyboardButton(
-                                                   text="Добавить в телеграм", url=f'{random_sticker_dict["url"]}')))
+                                               reply_markup=InlineKeyboardMarkup(row_width=1).add(
+                                                   InlineKeyboardButton(
+                                                       text="Добавить в телеграм",
+                                                       url=f'{random_sticker_dict["url"]}')))
                         count = count + 1
                 except Exception as ee:
                     print(f"Что то пошло не так {ee}")
@@ -469,7 +473,8 @@ async def show_type_category_callback_handler(collback: types.CallbackQuery):
 async def paginate_category_callback_handler(query: CallbackQuery, callback_data: dict):
     page = int(callback_data.get("page"))
     category_one = category_list[page]
-    keyboard = get_pagination_keyboard(page=page, category_list=category_list, categories_callback=categories_callback)
+    keyboard = get_pagination_keyboard(page=page, category_list=category_list,
+                                       categories_callback=categories_callback)
 
     await bot.send_animation(
         chat_id=query.from_user.id,
@@ -538,7 +543,8 @@ async def load_subj_sm_search(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['subj'] = message.text
     await FSMSearch.next()
-    await message.answer("Сколько найти? Максимальное количество - 1000 gifs. Пишите число, это например 1, 2, 22))")
+    await message.answer(
+        "Сколько найти? Максимальное количество - 1000 gifs. Пишите число, это например 1, 2, 22))")
 
 
 # Устанавливаем машину состояния в состояние приема названия и запрашиваем у пользователя текст
@@ -558,7 +564,6 @@ async def load_limit_sm_search(message: types.Message, state: FSMContext):
 
 
 # Машина состояний для randomAPI________________________________________________________________________________________
-
 
 class FSMRandom(StatesGroup):
     subj = State()
@@ -669,7 +674,8 @@ def register_handlers_admin(dp: Dispatcher):
     dp.register_message_handler(category_index_handler, Text(equals="Популярные категории", ignore_case=False))
 
     dp.register_callback_query_handler(today_holiday_message_handler, Text(equals="Сегодня", ignore_case=False))
-    dp.register_callback_query_handler(carendar_holiday_message_handler, Text(equals="Календарь", ignore_case=False))
+    dp.register_callback_query_handler(carendar_holiday_message_handler,
+                                       Text(equals="Календарь", ignore_case=False))
 
     dp.register_callback_query_handler(show_month_events_callback_handler, Text(startswith="month__"), state=None)
 
@@ -679,7 +685,8 @@ def register_handlers_admin(dp: Dispatcher):
                                        state=None)
 
     dp.register_callback_query_handler(paginate_category_callback_handler, categories_callback.filter())
-    dp.register_callback_query_handler(show_list_category_colaback_hendler, Text(startswith="category__"), state=None)
+    dp.register_callback_query_handler(show_list_category_colaback_hendler, Text(startswith="category__"),
+                                       state=None)
 
     dp.register_message_handler(choose_lang_handler, Text(equals="Найти по слову", ignore_case=False))
     dp.register_callback_query_handler(colaback_hendler_lang_start_search, Text(startswith="leng__"), state=None)
