@@ -126,7 +126,7 @@ async def stickers_search_handler(message: types.Message):
 
 
 @dp.message_handler(Text(equals="Показать все", ignore_case=False))
-async def show_alphabet_all_stickers_handler(message: types.Message):
+async def show_all_stickers_handler(message: types.Message):
     stickers_titles = stickers_dict.keys()
     stickers_titles_inline_kb = InlineKeyboardMarkup(row_width=3)
     paginate_inline_kb = InlineKeyboardMarkup(row_width=10)
@@ -162,10 +162,10 @@ async def show_alphabet_all_stickers_handler(message: types.Message):
     #                             InlineKeyboardButton("Надоело", callback_data="all_stick__enough")))
     #
 
-    @dp.callback_query_handler(stickers_paginate_callback.filter(action="check"))
-    async def all_stickers_pagination_callback_handler(collback: types.CallbackQuery, callback_data: dict):
-        bot.send_message(collback.from_user.id, callback_data["start_and"])
-        # @dp.callback_query_handler(Text(startswith="all_stick__"))
+@dp.callback_query_handler(stickers_paginate_callback.filter(action="check"))
+async def all_stickers_pagination_callback_handler(collback: types.CallbackQuery, callback_data: dict):
+    bot.send_message(collback.from_user.id, callback_data["start_and"])
+    # @dp.callback_query_handler(Text(startswith="all_stick__"))
         # async def all_stickers_pagination_callback_handler(collback: types.CallbackQuery):
         # global stickers_names_gen
         # if collback.data.split("__")[1] == "yet":
@@ -182,7 +182,7 @@ async def show_alphabet_all_stickers_handler(message: types.Message):
         #                            .row(InlineKeyboardButton("Продолжаем", callback_data="all_stick__yet"),
         #                                 InlineKeyboardButton("Надоело", callback_data="all_stick__enough")))
 
-        await collback.answer()
+    await collback.answer()
 
 
 @dp.message_handler(state=FSMStickersSearch.word)
@@ -668,8 +668,8 @@ def register_handlers_admin(dp: Dispatcher):
 
     dp.register_message_handler(stickers_random_handler, Text(equals="Случайные паки", ignore_case=False))
     dp.register_message_handler(stickers_search_handler, Text(equals="Может найду...", ignore_case=False))
-    dp.register_message_handler(show_alphabet_all_stickers_handler, Text(equals="Показать все", ignore_case=False))
-    dp.register_callback_query_handler(all_stickers_pagination_callback_handler, Text(startswith="all_stick__"))
+    dp.register_message_handler(show_all_stickers_handler, Text(equals="Показать все", ignore_case=False))
+    dp.register_callback_query_handler(all_stickers_pagination_callback_handler, stickers_paginate_callback.filter(action="check"))
 
     dp.register_message_handler(category_index_handler, Text(equals="Популярные категории", ignore_case=False))
 
