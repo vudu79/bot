@@ -47,7 +47,7 @@ class FSMStickersSearch(StatesGroup):
 #     focus: bool
 
 
-stickers_paginate_callback = CallbackData("action", "start_and")
+stickers_paginate_callback = CallbackData('action', 'start_end')
 
 gifs = dict()
 dbase = DBase()
@@ -136,7 +136,7 @@ async def show_all_stickers_handler(message: types.Message):
         activ = "👉" if num == 1 else ""
         paginate_inline_kb.insert(InlineKeyboardButton(f'{activ}{num}',
                                                        callback_data=stickers_paginate_callback.new(action="check",
-                                                                                                    start_and=page)))
+                                                                                                    start_end=page)))
 
     for x in range(0, 49):
         stickers_titles_inline_kb.insert(
@@ -162,25 +162,26 @@ async def show_all_stickers_handler(message: types.Message):
     #                             InlineKeyboardButton("Надоело", callback_data="all_stick__enough")))
     #
 
+
 @dp.callback_query_handler(stickers_paginate_callback.filter(action="check"))
 async def all_stickers_pagination_callback_handler(collback: types.CallbackQuery, callback_data: dict):
     bot.send_message(collback.from_user.id, callback_data["start_and"])
-    # @dp.callback_query_handler(Text(startswith="all_stick__"))
-        # async def all_stickers_pagination_callback_handler(collback: types.CallbackQuery):
-        # global stickers_names_gen
-        # if collback.data.split("__")[1] == "yet":
-        #     all_names_inline_menu.clean()
-        #     for x in range(0, 50):
-        #         name = next(stickers_names_gen)
-        #         all_names_inline_menu.add(InlineKeyboardButton(f'{name}', url=f'{stickers_dict[name]["url"]}'))
-        #
-        #     await bot.send_message(collback.from_user.id,
-        #                            f"Еще 50 шт...",
-        #                            reply_markup=all_names_inline_menu)
-        #     await bot.send_message(collback.from_user.id, "{Хватит?}",
-        #                            reply_markup=InlineKeyboardMarkup(row_width=2)
-        #                            .row(InlineKeyboardButton("Продолжаем", callback_data="all_stick__yet"),
-        #                                 InlineKeyboardButton("Надоело", callback_data="all_stick__enough")))
+    # @dp.callback_query_handler(Text(startswith="all_stick__"))z
+    # async def all_stickers_pagination_callback_handler(collback: types.CallbackQuery):
+    # global stickers_names_gen
+    # if collback.data.split("__")[1] == "yet":
+    #     all_names_inline_menu.clean()
+    #     for x in range(0, 50):
+    #         name = next(stickers_names_gen)
+    #         all_names_inline_menu.add(InlineKeyboardButton(f'{name}', url=f'{stickers_dict[name]["url"]}'))
+    #
+    #     await bot.send_message(collback.from_user.id,
+    #                            f"Еще 50 шт...",
+    #                            reply_markup=all_names_inline_menu)
+    #     await bot.send_message(collback.from_user.id, "{Хватит?}",
+    #                            reply_markup=InlineKeyboardMarkup(row_width=2)
+    #                            .row(InlineKeyboardButton("Продолжаем", callback_data="all_stick__yet"),
+    #                                 InlineKeyboardButton("Надоело", callback_data="all_stick__enough")))
 
     await collback.answer()
 
@@ -669,7 +670,8 @@ def register_handlers_admin(dp: Dispatcher):
     dp.register_message_handler(stickers_random_handler, Text(equals="Случайные паки", ignore_case=False))
     dp.register_message_handler(stickers_search_handler, Text(equals="Может найду...", ignore_case=False))
     dp.register_message_handler(show_all_stickers_handler, Text(equals="Показать все", ignore_case=False))
-    dp.register_callback_query_handler(all_stickers_pagination_callback_handler, stickers_paginate_callback.filter(action="check"))
+    dp.register_callback_query_handler(all_stickers_pagination_callback_handler,
+                                       stickers_paginate_callback.filter(action="check"))
 
     dp.register_message_handler(category_index_handler, Text(equals="Популярные категории", ignore_case=False))
 
