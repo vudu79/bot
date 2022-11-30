@@ -40,7 +40,7 @@ class FSMStickersSearch(StatesGroup):
     count = State()
 
 
-stickers_paginate_callback = CallbackData("filter", "start", "end", "focus")
+stickers_paginate_callback = CallbackData("filter", "start", "end")
 
 gifs = dict()
 dbase = DBase()
